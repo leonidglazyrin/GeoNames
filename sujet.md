@@ -125,6 +125,8 @@ Program parameters :
 
 Notez que ces messages d’erreur ne doivent comporter aucun **accent**, doivent être ecrits en minuscules et sans espace au début et à la fin : bref, ils doivent être orthographiés exactement comme décrit plus haut, car vos programmes seront vérifiés de façon automatique.
 
+
+
 Afin d'éviter des pénalités, il est important de respecter les contraintes suivantes :
 
 - Vous devez utiliser un **unique** fichier source nommé ``geonames.c``;
