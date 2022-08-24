@@ -46,7 +46,7 @@ alors votre programme affiche un tableau des 10 villes les plus populeuses comme
 
 Évidemment, si on utilise un nombre `n` plutôt que 10, alors ce sont les `n` villes les plus populeuses qui sont affichées. Afin de simplifier le travail, nous supposerons que `n` n'est pas trop grand (au plus 5000).
 
-Il est également important que l'affichage soit bien présenté. Les colonnes devraient être alignées et il ne devrait pas y avoir de décalage dû à des colonnes trop longues. Par conséquent, il est recommandé de choisir des largeur raisonnable pour chaque colonne et de couper les chaînes de caractères trop longues en utilisant les options de format de la fonction `printf`.
+Il est également important que l'affichage soit bien présenté. Les colonnes devraient être alignées et il ne devrait pas y avoir de décalage dû à des colonnes trop longues. Par conséquent, Vous devez obligatoirement utiliser les constantes `FORMAT_TITRE` et `FORMAT_COLONNES` dans les options de format de la fonction `printf` pour reproduire le même affichage.
 
 Pour faciliter la correction, `stdin` sera redirigé vers un fichier avec le même contenu.
 
@@ -338,17 +338,17 @@ Les critères d'évaluation sont les suivants:
 Critère | Sous-critère | Points
 ---- | -------------- | ---------:
 Foncrionnalité | Chargement des pays |10|
-  | Chargement des villes | 10 |
-  | Tri selon la population | 10 |
-  | Arguments de la fonction `main` | 5 |
-  | Qualité de l'affichage (colonnes alignées) | 10 |
+^^| Chargement des villes | 10 |
+^^| Tri selon la population | 10 |
+^^| Arguments de la fonction `main` | 5 |
+^^| Qualité de l'affichage (colonnes alignées) | 10 |
 Qualité du code | Modularité fonctionnelle |10|
-  | Style de programmation | 5 |
-  | Documentation (en-tête du fichier et des fonctions)|5|
+^^| Style de programmation | 5 |
+^^| Documentation (en-tête du fichier et des fonctions)|5|
 Makefile |Compilation, tests et nettoyage |10|
-  | Téléchargement des données et génération de la page HTML | 10 |
+^^| Téléchargement des données et génération de la page HTML | 10 |
 Utilisation de Git |Commits significatifs |10|
-  | Qualité des messages de commits | 5 |
+^^| Qualité des messages de commits | 5 |
 **Total**  |	|        **100**  |
 
 Plus précisément, les éléments suivants seront pris en compte:
