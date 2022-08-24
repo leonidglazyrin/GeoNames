@@ -189,22 +189,6 @@ Program parameters :\n\
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#define CHEMIN_VILLES "files/cities15000.txt"
-#define CHEMIN_PAYS "files/countryInfo.txt"
-#define LONG_MAX_LIGNE_PAYS 500
-#define LONG_MAX_LIGNE_VILLES 3500
-#define NUM_PAYS 252
-#define NUM_VILLES 24000
-#define NUM_MAX_VILLES 5000
-#define NUM_COL_PAYS_CODE 0
-#define NUM_COL_PAYS_NOM 4
-#define NUM_COL_VILLE_NOM 2
-#define NUM_COL_VILLE_CODE 8
-#define NUM_COL_VILLE_POP 14
-#define SEP_LIGNE "\t"
-#define CHAR_COMMENTAIRE '#'
-#define FORMAT_TITRE    "%4s   %-20.20s   %-20.20s   %s\n"
-#define FORMAT_COLONNES "%4d   %-20.20s   %-20.20s   %10ld\n"
 
 /**
  * ----------------
