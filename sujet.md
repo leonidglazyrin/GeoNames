@@ -101,17 +101,11 @@ vous devez vous assurer que le paramètre passé est un entier entre 1 et 5000. 
 
 Les messages d’erreur à afficher doivent être de la forme suivante :
 
-* **"trop d arguments"** s'il y a plus qu'un argument ;
-
-* **"nombre de ville invalide"** si le nombre de ville est plus petit que 1 et plus grand que 5000 ;
-
-* **"argument invalide"** si un caractère ou unr chaîne de caractères est donnée à la fonction main.
-
-Lorsque vous lancez le programme sans argument, un manuel d'utilisation doit
-être affiché sur la sortie standard:
+* **"nombre arguments invalide"** Si l'utilisateur oublie le paramètre ou en met en trop. Le manuel d'utilisation doit être affiché sur la sortie standard à la suite de ce message:
 
 ```text
 $ ./geonames
+nombre d'arguments invalide
 Usage: ./geonames <NUMBER OF CITIES>
 
 Display a table of the n most populous cities on stdout. 
@@ -124,6 +118,10 @@ Program parameters :
   NUMBER OF CITIES        Number de cities to print (1..500)
                            
 ```
+
+* **"nombre de ville invalide"** si le nombre de ville est plus petit que 1 et plus grand que 5000 ;
+
+* **"type argument invalide"** si un caractère ou une chaîne de caractères alphanumérique est passé à la fonction main.
 
 Notez que ces messages d’erreur ne doivent comporter aucun **accent**, doivent être ecrits en minuscules et sans espace au début et à la fin : bref, ils doivent être orthographiés exactement comme décrit plus haut, car vos programmes seront vérifiés de façon automatique.
 
@@ -189,20 +187,7 @@ Program parameters :\n\
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#define CHEMIN_VILLES "files/cities15000.txt"
-#define CHEMIN_PAYS "files/countryInfo.txt"
-#define LONG_MAX_LIGNE_PAYS 500
-#define LONG_MAX_LIGNE_VILLES 3500
-#define NUM_PAYS 252
-#define NUM_VILLES 24000
-#define NUM_MAX_VILLES 5000
-#define NUM_COL_PAYS_CODE 0
-#define NUM_COL_PAYS_NOM 4
-#define NUM_COL_VILLE_NOM 2
-#define NUM_COL_VILLE_CODE 8
-#define NUM_COL_VILLE_POP 14
-#define SEP_LIGNE "\t"
-#define CHAR_COMMENTAIRE '#'
+
 #define FORMAT_TITRE    "%4s   %-20.20s   %-20.20s   %s\n"
 #define FORMAT_COLONNES "%4d   %-20.20s   %-20.20s   %10ld\n"
 
@@ -234,8 +219,7 @@ enum error {
     OK                      = 0,
     ERREUR_NB_ARGS          = 1,
     ERREUR_NB_VILLES        = 2,
-    ERREUR_ARGS_INVALIDES   = 3,
-    ERREUR_PAS_ARGUMENT     = 4
+    ERREUR_ARGS_TYPE	     = 3
 };
 ```
 
@@ -352,19 +336,19 @@ Le travail est automatiquement remis à la date de remise prévue. Vous n'avez r
 Les critères d'évaluation sont les suivants:
 
 Critère | Sous-critère | Points
-----: | --------------: | ---------:
+---- | -------------- | ---------:
 Foncrionnalité | Chargement des pays |10|
-^^| Chargement des villes | 10 |
-^^| Tri selon la population | 10 |
-^^| Arguments de la fonction `main` | 5 |
-^^| Qualité de l'affichage (colonnes alignées) | 10 |
+  | Chargement des villes | 10 |
+  | Tri selon la population | 10 |
+  | Arguments de la fonction `main` | 5 |
+  | Qualité de l'affichage (colonnes alignées) | 10 |
 Qualité du code | Modularité fonctionnelle |10|
-^^| Style de programmation | 5 |
-^^| Documentation (en-tête du fichier et des fonctions)|5|
+  | Style de programmation | 5 |
+  | Documentation (en-tête du fichier et des fonctions)|5|
 Makefile |Compilation, tests et nettoyage |10|
-^^| Téléchargement des données et génération de la page HTML | 10 |
+  | Téléchargement des données et génération de la page HTML | 10 |
 Utilisation de Git |Commits significatifs |10|
-^^| Qualité des messages de commits | 5 |
+  | Qualité des messages de commits | 5 |
 **Total**  |	|        **100**  |
 
 Plus précisément, les éléments suivants seront pris en compte:

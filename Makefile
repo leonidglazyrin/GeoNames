@@ -1,4 +1,4 @@
-motdedyck: motdedyck.c
+geonames: geonames.c
 	gcc -o geonames -std=c11 geonames.c
 
 test:
