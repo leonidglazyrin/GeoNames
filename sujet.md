@@ -219,7 +219,7 @@ enum error {
     OK                      = 0,
     ERREUR_NB_ARGS          = 1,
     ERREUR_NB_VILLES        = 2,
-    ERREUR_ARGS_TYPE	     = 3
+    ERREUR_ARGS_TYPE	    = 3
 };
 ```
 
