@@ -86,12 +86,12 @@ remise, vous pouvez supprimer ce paragraphe).
 * [ ] Les usagers `dogny_g` et `correcteurs` a accès au projet en mode *Developer*
   (Pénalité de **50%**).
 * [ ] Le dépôt GitLab est un *fork* de [ce
-  dépôt](https://gitlab.info.uqam.ca/inf3135-sdo/h22-inf3135-tp1)
+  dépôt](https://gitlab.info.uqam.ca/inf3135-sdo/geonames)
   (Pénalité de **50%**).
 * [ ] Le dépôt GitLab est privé (Pénalité de **50%**).
 * [ ] Le dépôt contient au moins un fichier `.gitignore`.
 * [ ] Le fichier `Makefile` permet de compiler le projet lorsqu'on entre
-  `make`. Il supporte les cibles `html`, `test` et `clean`.
+  `make`. Il supporte les cibles `html`, `test`, `database` et `clean`.
 * [ ] Le nombre de tests qui réussissent/échouent avec la `make test` est
   indiqué quelque part dans le fichier `README.md`.
 * [ ] Les sections incomplètes de ce fichier (`README.md`) ont été complétées.

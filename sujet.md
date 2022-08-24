@@ -29,7 +29,6 @@ Votre travail consistera à utiliser certaines des données fournies pour affich
 alors votre programme affiche un tableau des 10 villes les plus populeuses comme suit (notez que le résultat peut différer légèrement s'il y a des mises à jour de la base de données) :
 
 ```
-
    Rang   Nom                    Pays                   Population
    ----   ---                    ----                   ----------
       1   Shanghai               China                    22315474
@@ -46,7 +45,7 @@ alors votre programme affiche un tableau des 10 villes les plus populeuses comme
 
 Évidemment, si on utilise un nombre `n` plutôt que 10, alors ce sont les `n` villes les plus populeuses qui sont affichées. Afin de simplifier le travail, nous supposerons que `n` n'est pas trop grand (au plus 5000).
 
-Il est également important que l'affichage soit bien présenté. Les colonnes devraient être alignées et il ne devrait pas y avoir de décalage dû à des colonnes trop longues. Par conséquent, Vous devez obligatoirement utiliser les constantes `FORMAT_TITRE` et `FORMAT_COLONNES` dans les options de format de la fonction `printf` pour reproduire le même affichage.
+Il est également important que l'affichage soit bien présenté. Les colonnes devraient être alignées et il ne devrait pas y avoir de décalage dû à des colonnes trop longues. Par conséquent, Vous devez obligatoirement utiliser les constantes `FORMAT_TITRE` et `FORMAT_COLONNES` dans les options de format de la fonction `printf` pour reproduire le même affichage (nécéssaire pour les tests).
 
 Pour faciliter la correction, `stdin` sera redirigé vers un fichier avec le même contenu.
 
@@ -55,19 +54,19 @@ Pour faciliter la correction, `stdin` sera redirigé vers un fichier avec le mê
 ```
 
 
-### Suggestions et indices
+## Suggestions et indices
 
 Bien qu'il y ait plusieurs façons de réaliser ce travail, je vous suggère de vous concentrer sur les deux fichiers suivants :
 
 - `countryInfo.txt`, qui contient les informations principales sur les pays. Vous pouvez entre autres établir la correspondance entre les codes des pays et leur nom (`CA` pour `Canada`, `US` pour `United States`, etc.).
-  **Remarque** : afin de minimiser les problèmes d'encodages, utiliser le nom ASCII du pays plutôt que son nom en UTF8.
+    **Remarque** : afin de minimiser les problèmes d'encodages, utiliser le nom ASCII du pays plutôt que son nom en UTF8.
 - ``cities15000.txt``, qui dresse la liste des villes et lieu ayant au moins 15000 habitants. Ici aussi, il est préférable d'utiliser le nom ASCII.
 
 **Attention** : vous ne pouvez pas supposer que les fichiers `countryInfo.txt` et `cities15000.txt` sont toujours les mêmes, mais seulement le contenu des colonnes ! Autrement dit, vous devez charger dynamiquement le contenu de ces fichiers dans votre programme.
 
 Lorsque vous avez chargé en mémoire (dans un tableau) la totalité des villes et des pays, alors vous devriez trier les villes en ordre **décroissant** de leur population à l'aide de l'algorithme de **tri rapide**, que vous devez implémenter (si vous utilisez du code déjà existant, citez vos sources). Puis il ne vous reste plus qu'à afficher les `n` premières villes, où `n` est un argument passé en paramètre à votre fonction `main`.
 
-Je vous suggère les types suivants (les constantes ``PAYS_BIDON`` et ``VILLE_BIDON`` peuvent être utilisées pour représenter des pays et des villes non initialisées ou invalides) :
+Je vous suggère les types suivants :
 
 ```
    struct Pays {
@@ -83,12 +82,12 @@ Je vous suggère les types suivants (les constantes ``PAYS_BIDON`` et ``VILLE_BI
    };
    const struct Ville VILLE_BIDON = {"??", -1, {"??", "??"}};
 ```
+Les constantes ``PAYS_BIDON`` et ``VILLE_BIDON`` peuvent être utilisées pour représenter des pays et des villes non initialisées ou invalides. Vous êtes libre d'utiliser d'autres types de donnés si vous le souhaitez.
 
-Vous êtes libre d'utiliser d'autres types de donnés si vous le souhaitez.
 
 **Remarque** : comme l'allocation dynamique n'est pas vue dans les 3 premières semaines, toutes vos chaînes de caractères auront une longueur maximale fixe, précisée par une constante.
 
-### Détails additionnels et exigences
+## Détails additionnels et exigences
 
 Lorsqu'un utilisateur entre la commande
 
@@ -96,10 +95,10 @@ Lorsqu'un utilisateur entre la commande
    ./tp1 <nombre de villes>
 ```
 
-vous devez vous assurer que le paramètre passé est un entier entre 1 et 5000. Si ce n'est pas le cas, un message d'erreur pertinent doit être affiché et un code d'erreur identifiant l'erreur doit être retourné par la fonction `main`.
+vous devez vous assurer que le paramètre passé est un entier entre 1 et 5000. Si ce n'est pas le cas, un message d'erreur  doit être affiché et un code d'erreur identifiant l'erreur doit être retourné par la fonction `main`.
 
 
-Les messages d’erreur à afficher doivent être de la forme suivante :
+Les messages d’erreur à afficher sont les suivants :
 
 * **"nombre arguments invalide"** Si l'utilisateur oublie le paramètre ou en met en trop. Le manuel d'utilisation doit être affiché sur la sortie standard à la suite de ce message:
 
@@ -169,7 +168,7 @@ Vous devez cloner le dépôt fourni et l'héberger sur la plateforme [Gitlab du
 département](https://gitlab.info.uqam.ca/). Votre dépôt devra se nommer
 **exactement** `inf3135-tp1-a22` et l'URL devra être **exactement**
 `https://gitlab.info.uqam.ca/<utilisateur>/inf3135-tp1-a22`, où
-`<utilisateur>` doit être remplacé par votre code MS de l'UQAM ou par votre nom d'utilisateur. Il devra être **privé** et accessible seulement par vous et les usagers `dogny_g` et `correcteurs`.
+`<utilisateur>` est votre code MS de l'UQAM ou votre nom d'utilisateur. Il devra être **privé** et accessible seulement par vous et les usagers `dogny_g` et `correcteurs`.
 
 ### Fichier `geonames.c`
 
@@ -322,7 +321,7 @@ de **50%** sera imposée :
 
 - Votre dépôt doit se nommer **exactement** `inf3135-tp1-a22`
 - L'URL de votre dépôt doit être **exactement** `https://gitlab.info.uqam.ca/<utilisateur>/inf3135-tp1-a22` où
-  `<utilisateur>` doit être remplacé par votre identifiant.
+  `<utilisateur>` est votre identifiant.
 - Les usagers `dogny_g` et `correcteurs` doivent avoir accès à votre projet en mode `Developer`.
 - Votre dépôt doit être un *fork* du [gabarit fourni](https://gitlab.info.uqam.ca/inf3135-sdo/geonames).
 - Votre dépôt doit être **privé**.
@@ -333,7 +332,7 @@ de **50%** sera imposée :
 
 Le travail est automatiquement remis à la date de remise prévue. Vous n'avez rien de plus à faire. Assurez-vous d’avoir votre travail disponible sur votre branche `master/main` qui sera considérée pour la correction. Tous les commits après le **9 octobre 2022 à 23:55** ne seront pas considérés pour la correction.
 
-### Barème
+## Barème
 
 Les critères d'évaluation sont les suivants:
 
