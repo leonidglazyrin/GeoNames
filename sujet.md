@@ -149,8 +149,8 @@ Advenant le non-respect d'une ou plusieurs de ces contraintes, des pénalités *
 Afin de compléter ce travail pratique, vous devrez suivre les étapes suivantes:
 
 1. Créez un clone (*fork*) du [dépôt du projet](https://gitlab.info.uqam.ca/inf3135-sdo/geonames).
-2. Assurez-vous que le dépôt soit privé, pour éviter le plagiat.
-3. Donnez accès à votre dépôt aux usagers `dogny_g` et `correcteur` en mode `Developer`.
+2. Assurez-vous que le dépôt soit **privé**, pour éviter le plagiat.
+3. Donnez accès à votre dépôt aux usagers `dogny_g`, `@bernardos.pedro_luis` et `@zavaleta_chuquicaja.willy` en mode `Developer`.
 4. Familiarisez-vous avec le contenu du dépôt, en étudiant chacun des fichiers
    (`README.md`, `sujet.md`, `check.bats`, `.gitlab-ci.yml`, etc.).
 5. Commencez votre développement en versionnant fréquemment l'évolution de
