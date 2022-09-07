@@ -314,7 +314,9 @@ apporter des précisions à l'ensemble de la classe si nécessaire.
 
 ### Pénalités
 
-Tout programme qui ne compile pas se verra automatiquement attribuer **la note 0**.
+Tout programme qui ne compile pas se verra automatiquement attribuer **la note 0**. Plus précisément, 
+
+- Votre travail doit être rédigé en **langage C et doit compiler sans erreur et sans avertissement** sur le **serveur Java** de l’UQAM (java.labunix.uqam.ca). Pour vous y connecter, vous devez connaître votre CodeMS (de la forme ab123456) ainsi que votre mot de passe (de la forme ABC12345)
 
 En outre, si vous ne respectez pas les critères suivants, une pénalité
 de **50%** sera imposée :
@@ -378,6 +380,6 @@ Plus précisément, les éléments suivants seront pris en compte:
 
 ---
 
-Si vous êtes arrivé à ce stade du document, c'est que vous l'avez lu en entier, comme demandé dans la consigne au tout début du sujet. Envoyez en message privé au professeur sur le Slack une photo d'un animal mignon (p.-ex. une loutre, un chaton, un chiot, un capybara) pour en témoigner. Les cinq (5) premiers étudiants à remplir cette condition bénéficieront de cinq (5) points bonus sur l'évaluation de ce projet (la note maximale reste de 100). 
+Si vous êtes arrivé à ce stade du document, c'est que vous l'avez lu en entier, comme demandé dans la consigne au tout début du sujet. Envoyez en message privé au professeur sur le canal mattermost une photo d'un animal mignon (p.-ex. une loutre, un chaton, un chiot, un capybara) pour en témoigner. Les cinq (5) premiers étudiants à remplir cette condition bénéficieront de cinq (5) points bonus sur l'évaluation de ce projet (la note maximale reste de 100). 
 
 ---
