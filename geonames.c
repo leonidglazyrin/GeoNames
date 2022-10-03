@@ -11,6 +11,7 @@ Program parameters :\n\
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <errno.h>
 
 #define FORMAT_TITRE    "%4s   %-20.20s   %-20.20s   %s\n"
 #define FORMAT_COLONNES "%4d   %-20.20s   %-20.20s   %10ld\n"
@@ -33,6 +34,29 @@ struct Ville {
 };
 const struct Ville VILLE_BIDON = {"??", -1, {"??", "??"}};
 
+// typedef struct {
+//     int geonameid;  
+//     char name[200];
+//     char asciiname[200];     
+//     char alternatenames[10000];
+//     double latitude;
+//     double longitude;     
+//     char feature_class[1]; 
+//     char feature_code[10];
+//     char country_code[3];
+//     char cc2[200];
+//     char admin1_code[20];
+//     char admin2_code[80];
+//     char admin3_code[20];
+//     char admin4_code[20];
+//     unsigned int population;
+//     int elevation;
+//     int dem; 
+//     char timezone[40];
+//     char modification 
+//     char date[15];
+// } Country;
+
 /**
  * -----------------------
  * Codes d'erreur
@@ -49,24 +73,32 @@ enum error {
 
 int main(int argc, char *argv[]) {
     FILE *fptr;
-    char text[1000];
+    char buffer[1001];
 
     fptr = fopen("cities15000.txt", "r");
     
     if (fptr == NULL)
     {
-        printf("Cannot open file \n");
+        printf("Erreur %d\n", errno);
         return 1;
     }
     
-    // while (fgets(text, 255, fptr)!=NULL) 
-    // {
-    //     printf ("%s", text);
-    // }
+    printf("Contenu du fichier :\n\n");
+    while (fgets(buffer, 1000, fptr)!=NULL) 
+        printf ("%s", buffer);
 
-    fgets(text, 1000, fptr);
-    printf ("%s", text);
+    if (fclose(fptr) == EOF)
+    {
+        printf("Erreur dans la fermeture du fichier.\n");
+    }
 
-    fclose(fptr);
     return 0;
+    
+    // fscanf(fptr,"%i %s %s %s %lf %lf %s %s %s %s %s %s %s %s %u %i %i %s %s\n", name, &age, &id, town);
+
+    // fgets(text, 1000, fptr);
+    // printf ("%s", text);
+
+    // fclose(fptr);
+    // return 0;
 }
