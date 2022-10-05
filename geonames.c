@@ -69,29 +69,29 @@ enum error {
     ERREUR_ARGS_TYPE	    = 3
 };
 
+//Prototypes
+unsigned int count_lines(FILE *fptr);
+
 int main(int argc, char *argv[]) {
     FILE *fptr;
     char buffer[sizeof(struct country) + 1];
+    char *file_name = "cities15000.txt";
 
-    fptr = fopen("cities15000.txt", "r");
+    fptr = fopen(file_name, "r");
     
     if (fptr == NULL)
     {
         printf("Erreur %d\n", errno);
         return 1;
     }
+
+    unsigned int file_lines = count_lines(fptr);
+    printf("%d", file_lines);
     
     while (fgets(buffer, sizeof(struct country), fptr) != NULL) 
     {
-        struct country country1;
-        // sscanf(buffer,"%i\t%s\t%s\t%s\t%lf\t%lf\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%u\t%i\t%i\t%s\t%s\n", &country1.geonameid, country1.name, country1.asciiname, country1.alternatenames, &country1.latitude, &country1.longitude, country1.feature_class, country1.feature_code, country1.country_code, country1.cc2, country1.admin1_code, country1.admin2_code, country1.admin3_code, country1.admin4_code, &country1.population, &country1.elevation, &country1.dem, country1.timezone, country1.modification_date);
-        
-        // fgets(buffer, sizeof(struct country), fptr); <--- Here fuck
-
         char *geonameid, *name, *asciiname, *alternatenames, *latitude, *longitude, *feature_class, *feature_code, *country_code, *cc2, *admin1_code, *admin2_code, *admin3_code, *admin4_code, *population, *elevation, *dem, *timezone, *modification_date;
-        
-        // char r[sizeof(struct country) + 1];
-        // strcpy(r, buffer);
+
         char *r = buffer;
 
         geonameid = strsep(&r, "\t");
@@ -114,15 +114,8 @@ int main(int argc, char *argv[]) {
         timezone = strsep(&r, "\t");
         modification_date = strsep(&r, "\n");
 
-        if (strcmp("New York City", asciiname) == 0)
-        {
-            printf ("%s %s %s\n", asciiname, country_code, population);
-        }
         // printf ("%s %s %s\n", asciiname, country_code, population);
 
-        // printf ("%s %s %s\n", country1.asciiname, country1.country_code, country1.admin1_code);
-        // printf ("%i\t%s\t%s\t%s\t%lf\t%lf\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%u\t%i\t%i\t%s\t%s\n", country1.geonameid, country1.name, country1.asciiname, country1.alternatenames, country1.latitude, country1.longitude, country1.feature_class, country1.feature_code, country1.country_code, country1.cc2, country1.admin1_code, country1.admin2_code, country1.admin3_code, country1.admin4_code, country1.population, country1.elevation, country1.dem, country1.timezone, country1.modification_date);
-        // printf("%s", buffer);
     }
 
     if (fclose(fptr) == EOF)
@@ -131,4 +124,16 @@ int main(int argc, char *argv[]) {
     }
 
     return 0;
+}
+
+unsigned int count_lines(FILE *fptr) {
+    unsigned int count = 0;
+    char c;
+
+    for (c = getc(fptr); c != EOF; c = getc(fptr))
+        if (c == '\n') // Increment count if this character is newline
+            count = count + 1;
+
+    rewind(fptr);
+    return count;
 }
