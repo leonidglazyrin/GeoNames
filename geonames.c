@@ -75,72 +75,15 @@ enum error {
     ERREUR_ARGS_TYPE	    = 3
 };
 
-//Prototypes
 unsigned int count_lines(FILE *fptr);
+void load_cities();
+FILE* open_cities();
+void iterate_cities();
+void close_cities(FILE *fptr);
+void fill_fields(struct city2 cities[], char buffer[],int city_count);
 
 int main(int argc, char *argv[]) {
-    FILE *fptr;
-    char buffer[sizeof(struct city) + 1];
-    char *file_name = "cities15000.txt";
-
-    fptr = fopen(file_name, "r");
-    
-    if (fptr == NULL)
-    {
-        printf("Erreur %d\n", errno);
-        return 1;
-    }
-
-    unsigned int file_lines = count_lines(fptr);
-    struct city2 cities[file_lines + 1];
-    int city_count = 0;
-
-    while (fgets(buffer, sizeof(struct city), fptr) != NULL) 
-    {
-        char *geonameid, *name, *asciiname, *alternatenames, *latitude, *longitude, *feature_class, *feature_code, *country_code, *cc2, *admin1_code, *admin2_code, *admin3_code, *admin4_code, *population, *elevation, *dem, *timezone, *modification_date;
-
-        char *r = buffer;
-
-        geonameid = strsep(&r, "\t");
-        name = strsep(&r, "\t");
-        asciiname = strsep(&r, "\t");
-        alternatenames = strsep(&r, "\t");
-        latitude = strsep(&r, "\t");
-        longitude = strsep(&r, "\t");
-        feature_class = strsep(&r, "\t");
-        feature_code = strsep(&r, "\t");
-        country_code = strsep(&r, "\t");
-        cc2 = strsep(&r, "\t");
-        admin1_code = strsep(&r, "\t");
-        admin2_code = strsep(&r, "\t");
-        admin3_code = strsep(&r, "\t");
-        admin4_code = strsep(&r, "\t");
-        population = strsep(&r, "\t");
-        elevation = strsep(&r, "\t");
-        dem = strsep(&r, "\t");
-        timezone = strsep(&r, "\t");
-        modification_date = strsep(&r, "\n");
-
-        strcpy(cities[city_count].asciiname, asciiname);
-        strcpy(cities[city_count].country_code, country_code);
-        cities[city_count].population = (unsigned int) atoi(population);
-
-        city_count = city_count + 1;
-
-        // printf ("%s %s %s\n", asciiname, country_code, population);
-    }
-
-    int i;
-    for (i = 0; i < file_lines; ++i)
-    {
-        printf ("%s %s %u\n", cities[i].asciiname, cities[i].country_code, cities[i].population);
-    }
-
-    if (fclose(fptr) == EOF)
-    {
-        printf("Erreur dans la fermeture du fichier.\n");
-    }
-
+    load_cities();
     return 0;
 }
 
@@ -154,4 +97,68 @@ unsigned int count_lines(FILE *fptr) {
 
     rewind(fptr);
     return count;
+}
+
+void load_cities() {
+    FILE *fptr = open_cities();
+    iterate_cities();
+    
+    char buffer[sizeof(struct city) + 1];
+
+    unsigned int file_lines = count_lines(fptr);
+    struct city2 cities[file_lines];
+    int city_count = 0;
+
+    while (fgets(buffer, sizeof(struct city), fptr) != NULL && strlen(buffer) > 10) {
+        fill_fields(cities, buffer, city_count);
+        city_count = city_count + 1;
+    }
+
+    int i;
+    for (i = 0; i < file_lines; ++i)
+    {
+        printf ("%s %s %u\n", cities[i].asciiname, cities[i].country_code, cities[i].population);
+    }
+
+    close_cities(fptr);
+}
+
+void close_cities(FILE *fptr) {
+    if (fclose(fptr) == EOF) {
+        printf("Erreur dans la fermeture du fichier.\n");
+        exit(2);
+    }
+}
+
+void iterate_cities() {
+    
+}
+
+FILE* open_cities() {
+    char *file_name = "cities15000.txt";
+
+    FILE *fptr = fopen(file_name, "r");
+    
+    if (fptr == NULL) {
+        printf("Erreur %d\n", errno);
+        exit(1);
+    }
+    return fptr;
+}
+
+void fill_fields(struct city2 cities[], char buffer[], int city_count) {
+    char *r = buffer;
+    int field_count = 1;
+    char *field;
+
+    while ((field = strsep(&r, "\t")) != NULL) {
+        if (field_count == 3) {
+            strcpy(cities[city_count].asciiname, field);
+        } else if (field_count == 9) {
+            strcpy(cities[city_count].country_code, field);
+        } else if (field_count == 15) {
+            cities[city_count].population = (unsigned int) atoi(field);
+        }
+        field_count = field_count + 1;
+    }
 }
