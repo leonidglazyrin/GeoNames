@@ -34,7 +34,7 @@ struct Ville {
 };
 const struct Ville VILLE_BIDON = {"??", -1, {"??", "??"}};
 
-struct country{
+struct city{
     int geonameid;  
     char name[205];
     char asciiname[205];     
@@ -56,6 +56,12 @@ struct country{
     char modification_date[15];
 };
 
+struct city2{
+    char asciiname[205];     
+    char country_code[10];
+    unsigned int population;
+};
+
 /**
  * -----------------------
  * Codes d'erreur
@@ -74,7 +80,7 @@ unsigned int count_lines(FILE *fptr);
 
 int main(int argc, char *argv[]) {
     FILE *fptr;
-    char buffer[sizeof(struct country) + 1];
+    char buffer[sizeof(struct city) + 1];
     char *file_name = "cities15000.txt";
 
     fptr = fopen(file_name, "r");
@@ -86,9 +92,10 @@ int main(int argc, char *argv[]) {
     }
 
     unsigned int file_lines = count_lines(fptr);
-    printf("%d", file_lines);
-    
-    while (fgets(buffer, sizeof(struct country), fptr) != NULL) 
+    struct city2 cities[file_lines + 1];
+    int city_count = 0;
+
+    while (fgets(buffer, sizeof(struct city), fptr) != NULL) 
     {
         char *geonameid, *name, *asciiname, *alternatenames, *latitude, *longitude, *feature_class, *feature_code, *country_code, *cc2, *admin1_code, *admin2_code, *admin3_code, *admin4_code, *population, *elevation, *dem, *timezone, *modification_date;
 
@@ -114,8 +121,19 @@ int main(int argc, char *argv[]) {
         timezone = strsep(&r, "\t");
         modification_date = strsep(&r, "\n");
 
-        // printf ("%s %s %s\n", asciiname, country_code, population);
+        strcpy(cities[city_count].asciiname, asciiname);
+        strcpy(cities[city_count].country_code, country_code);
+        cities[city_count].population = (unsigned int) atoi(population);
 
+        city_count = city_count + 1;
+
+        // printf ("%s %s %s\n", asciiname, country_code, population);
+    }
+
+    int i;
+    for (i = 0; i < file_lines; ++i)
+    {
+        printf ("%s %s %u\n", cities[i].asciiname, cities[i].country_code, cities[i].population);
     }
 
     if (fclose(fptr) == EOF)
