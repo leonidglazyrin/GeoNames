@@ -34,28 +34,27 @@ struct Ville {
 };
 const struct Ville VILLE_BIDON = {"??", -1, {"??", "??"}};
 
-// typedef struct {
-//     int geonameid;  
-//     char name[200];
-//     char asciiname[200];     
-//     char alternatenames[10000];
-//     double latitude;
-//     double longitude;     
-//     char feature_class[1]; 
-//     char feature_code[10];
-//     char country_code[3];
-//     char cc2[200];
-//     char admin1_code[20];
-//     char admin2_code[80];
-//     char admin3_code[20];
-//     char admin4_code[20];
-//     unsigned int population;
-//     int elevation;
-//     int dem; 
-//     char timezone[40];
-//     char modification 
-//     char date[15];
-// } Country;
+struct country{
+    int geonameid;  
+    char name[205];
+    char asciiname[205];     
+    char alternatenames[10005];
+    double latitude;
+    double longitude;     
+    char feature_class[5]; 
+    char feature_code[15];
+    char country_code[10];
+    char cc2[205];
+    char admin1_code[25];
+    char admin2_code[85];
+    char admin3_code[25];
+    char admin4_code[25];
+    unsigned int population;
+    int elevation;
+    int dem; 
+    char timezone[45];
+    char modification_date[15];
+};
 
 /**
  * -----------------------
@@ -70,10 +69,23 @@ enum error {
     ERREUR_ARGS_TYPE	    = 3
 };
 
+// int getIndex(int len, char *buffer) {
+//     int i;
+//     for (i = 0; i < len; i++)
+//     {
+//         if (buffer[i] == '\t')
+//         {
+//             return i;
+//         }
+//     }
+//     return 0;
+// }
+
 
 int main(int argc, char *argv[]) {
     FILE *fptr;
-    char buffer[1001];
+    // struct country country1;
+    char buffer[sizeof(struct country) + 1];
 
     fptr = fopen("cities15000.txt", "r");
     
@@ -84,8 +96,28 @@ int main(int argc, char *argv[]) {
     }
     
     printf("Contenu du fichier :\n\n");
-    while (fgets(buffer, 1000, fptr)!=NULL) 
-        printf ("%s", buffer);
+
+    // while(fread(&country1, sizeof(struct country), 1, fptr))
+    // {
+    //     printf("%d\n", country1.geonameid);
+    // }
+
+    while (fgets(buffer, sizeof(struct country), fptr) != NULL) 
+    {
+        struct country country1;
+        sscanf(buffer,"%i\t%s\t%s\t%s\t%lf\t%lf\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%u\t%i\t%i\t%s\t%s\n", &country1.geonameid, country1.name, country1.asciiname, country1.alternatenames, &country1.latitude, &country1.longitude, country1.feature_class, country1.feature_code, country1.country_code, country1.cc2, country1.admin1_code, country1.admin2_code, country1.admin3_code, country1.admin4_code, &country1.population, &country1.elevation, &country1.dem, country1.timezone, country1.modification_date);
+        // if (atoi(country1.admin1_code) > atoi(country1.admin2_code))
+        // {
+        //     printf ("%s %s %s\n", country1.name, country1.country_code, country1.admin1_code);
+        // }
+        // else
+        // {
+        //     printf ("%s %s %s\n", country1.name, country1.country_code, country1.admin2_code);
+        // }
+        printf ("%s %s %s\n", country1.asciiname, country1.country_code, country1.admin1_code);
+        // printf ("%i\t%s\t%s\t%s\t%lf\t%lf\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%u\t%i\t%i\t%s\t%s\n", country1.geonameid, country1.name, country1.asciiname, country1.alternatenames, country1.latitude, country1.longitude, country1.feature_class, country1.feature_code, country1.country_code, country1.cc2, country1.admin1_code, country1.admin2_code, country1.admin3_code, country1.admin4_code, country1.population, country1.elevation, country1.dem, country1.timezone, country1.modification_date);
+        // printf("%s", buffer);
+    }
 
     if (fclose(fptr) == EOF)
     {
