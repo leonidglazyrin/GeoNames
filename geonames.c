@@ -69,22 +69,8 @@ enum error {
     ERREUR_ARGS_TYPE	    = 3
 };
 
-// int getIndex(int len, char *buffer) {
-//     int i;
-//     for (i = 0; i < len; i++)
-//     {
-//         if (buffer[i] == '\t')
-//         {
-//             return i;
-//         }
-//     }
-//     return 0;
-// }
-
-
 int main(int argc, char *argv[]) {
     FILE *fptr;
-    // struct country country1;
     char buffer[sizeof(struct country) + 1];
 
     fptr = fopen("cities15000.txt", "r");
@@ -95,26 +81,46 @@ int main(int argc, char *argv[]) {
         return 1;
     }
     
-    printf("Contenu du fichier :\n\n");
-
-    // while(fread(&country1, sizeof(struct country), 1, fptr))
-    // {
-    //     printf("%d\n", country1.geonameid);
-    // }
-
     while (fgets(buffer, sizeof(struct country), fptr) != NULL) 
     {
         struct country country1;
-        sscanf(buffer,"%i\t%s\t%s\t%s\t%lf\t%lf\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%u\t%i\t%i\t%s\t%s\n", &country1.geonameid, country1.name, country1.asciiname, country1.alternatenames, &country1.latitude, &country1.longitude, country1.feature_class, country1.feature_code, country1.country_code, country1.cc2, country1.admin1_code, country1.admin2_code, country1.admin3_code, country1.admin4_code, &country1.population, &country1.elevation, &country1.dem, country1.timezone, country1.modification_date);
-        // if (atoi(country1.admin1_code) > atoi(country1.admin2_code))
-        // {
-        //     printf ("%s %s %s\n", country1.name, country1.country_code, country1.admin1_code);
-        // }
-        // else
-        // {
-        //     printf ("%s %s %s\n", country1.name, country1.country_code, country1.admin2_code);
-        // }
-        printf ("%s %s %s\n", country1.asciiname, country1.country_code, country1.admin1_code);
+        // sscanf(buffer,"%i\t%s\t%s\t%s\t%lf\t%lf\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%u\t%i\t%i\t%s\t%s\n", &country1.geonameid, country1.name, country1.asciiname, country1.alternatenames, &country1.latitude, &country1.longitude, country1.feature_class, country1.feature_code, country1.country_code, country1.cc2, country1.admin1_code, country1.admin2_code, country1.admin3_code, country1.admin4_code, &country1.population, &country1.elevation, &country1.dem, country1.timezone, country1.modification_date);
+        
+        // fgets(buffer, sizeof(struct country), fptr); <--- Here fuck
+
+        char *geonameid, *name, *asciiname, *alternatenames, *latitude, *longitude, *feature_class, *feature_code, *country_code, *cc2, *admin1_code, *admin2_code, *admin3_code, *admin4_code, *population, *elevation, *dem, *timezone, *modification_date;
+        
+        // char r[sizeof(struct country) + 1];
+        // strcpy(r, buffer);
+        char *r = buffer;
+
+        geonameid = strsep(&r, "\t");
+        name = strsep(&r, "\t");
+        asciiname = strsep(&r, "\t");
+        alternatenames = strsep(&r, "\t");
+        latitude = strsep(&r, "\t");
+        longitude = strsep(&r, "\t");
+        feature_class = strsep(&r, "\t");
+        feature_code = strsep(&r, "\t");
+        country_code = strsep(&r, "\t");
+        cc2 = strsep(&r, "\t");
+        admin1_code = strsep(&r, "\t");
+        admin2_code = strsep(&r, "\t");
+        admin3_code = strsep(&r, "\t");
+        admin4_code = strsep(&r, "\t");
+        population = strsep(&r, "\t");
+        elevation = strsep(&r, "\t");
+        dem = strsep(&r, "\t");
+        timezone = strsep(&r, "\t");
+        modification_date = strsep(&r, "\n");
+
+        if (strcmp("New York City", asciiname) == 0)
+        {
+            printf ("%s %s %s\n", asciiname, country_code, population);
+        }
+        // printf ("%s %s %s\n", asciiname, country_code, population);
+
+        // printf ("%s %s %s\n", country1.asciiname, country1.country_code, country1.admin1_code);
         // printf ("%i\t%s\t%s\t%s\t%lf\t%lf\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%u\t%i\t%i\t%s\t%s\n", country1.geonameid, country1.name, country1.asciiname, country1.alternatenames, country1.latitude, country1.longitude, country1.feature_class, country1.feature_code, country1.country_code, country1.cc2, country1.admin1_code, country1.admin2_code, country1.admin3_code, country1.admin4_code, country1.population, country1.elevation, country1.dem, country1.timezone, country1.modification_date);
         // printf("%s", buffer);
     }
@@ -125,12 +131,4 @@ int main(int argc, char *argv[]) {
     }
 
     return 0;
-    
-    // fscanf(fptr,"%i %s %s %s %lf %lf %s %s %s %s %s %s %s %s %u %i %i %s %s\n", name, &age, &id, town);
-
-    // fgets(text, 1000, fptr);
-    // printf ("%s", text);
-
-    // fclose(fptr);
-    // return 0;
 }
