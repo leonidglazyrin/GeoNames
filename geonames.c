@@ -97,21 +97,33 @@ enum error {
     ERREUR_ARGS_TYPE	    = 3
 };
 
-unsigned int count_lines(FILE *fptr);
-void load_cities();
-FILE* open_file();
+unsigned int count_lines(char *file_name);
+void load_cities(struct city *cities);
+FILE* open_file(char *file_name);
 void close_file(FILE *fptr);
 void fill_fields_city(struct city *one_city, char *buffer);
-void load_countries();
+void load_countries(struct Pays *countries);
 void fill_fields_country(struct Pays *one_country, char *buffer);
 
 int main(int argc, char *argv[]) {
-    load_cities();
-    load_countries();
+    struct city cities[count_lines("cities15000.txt")];
+    load_cities(cities);
+    struct Pays countries[count_lines("countryInfo.txt")];
+    load_countries(countries);
+
+    //Debug only
+    unsigned int file_lines = count_lines("cities15000.txt");
+    int i;
+    for (i = 0; i < file_lines; ++i)
+    {
+        printf ("%s %s %u\n", cities[i].asciiname, cities[i].country_code, cities[i].population);
+    }
+
     return 0;
 }
 
-unsigned int count_lines(FILE *fptr) {
+unsigned int count_lines(char *file_name) {
+    FILE *fptr = open_file(file_name);
     unsigned int count = 0;
     char c;
 
@@ -119,16 +131,13 @@ unsigned int count_lines(FILE *fptr) {
         if (c == '\n') // Increment count if this character is newline
             count = count + 1;
 
-    rewind(fptr);
+    close_file(fptr);
     return count;
 }
 
-void load_cities() {
+void load_cities(struct city *cities) {
     FILE *fptr = open_file("cities15000.txt");
-    unsigned int file_lines = count_lines(fptr);
-    
     char buffer[sizeof(struct ReadCity) + 1];
-    struct city cities[file_lines];
     int city_count = 0;
 
     while (fgets(buffer, sizeof(struct ReadCity), fptr) != NULL && strlen(buffer) > 10) {
@@ -178,11 +187,9 @@ void fill_fields_city(struct city *one_city, char *buffer) {
     }
 }
 
-void load_countries() {
+void load_countries(struct Pays *countries) {
     FILE *fptr = open_file("countryInfo.txt");
-    unsigned int file_lines = count_lines(fptr);
     char buffer[sizeof(struct ReadCountry) + 1];
-    struct Pays countries[file_lines];
     int country_count = 0;
 
     while (fgets(buffer, sizeof(struct ReadCountry), fptr) != NULL) {
@@ -192,11 +199,11 @@ void load_countries() {
         }
     }
 
-    int i;
-    for (i = 0; i < country_count; ++i)
-    {
-        printf ("%s %s\n", countries[i].nom, countries[i].code);
-    }
+    // int i;
+    // for (i = 0; i < country_count; ++i)
+    // {
+    //     printf ("%s %s\n", countries[i].nom, countries[i].code);
+    // }
 
     close_file(fptr);
 }
