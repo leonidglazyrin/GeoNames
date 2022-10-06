@@ -27,14 +27,14 @@ struct Pays {
     char nom[50]; // Le nom du pays
     char code[3]; // Le code de deux lettres identifiant le pays
 };
-const struct Pays PAYS_BIDON = {"??", "??"};
+// const struct Pays PAYS_BIDON = {"??", "??"};
 
-struct Ville {
-    char nom[100];    // Le nom ASCII de la ville
-    long population;  // La population
-    struct Pays pays; // Le pays dans laquelle la ville existe
-};
-const struct Ville VILLE_BIDON = {"??", -1, {"??", "??"}};
+// struct Ville {
+//     char nom[100];    // Le nom ASCII de la ville
+//     long population;  // La population
+//     struct Pays pays; // Le pays dans laquelle la ville existe
+// };
+// const struct Ville VILLE_BIDON = {"??", -1, {"??", "??"}};
 
 struct ReadCity{
     int geonameid;  
@@ -58,27 +58,27 @@ struct ReadCity{
     char modification_date[15];
 };
 
-struct ReadCountry{
-    int geonameid;  
-    char name[205];
-    char asciiname[205];     
-    char alternatenames[10005];
-    double latitude;
-    double longitude;     
-    char feature_class[5]; 
-    char feature_code[15];
-    char country_code[10];
-    char cc2[205];
-    char admin1_code[25];
-    char admin2_code[85];
-    char admin3_code[25];
-    char admin4_code[25];
-    unsigned int population;
-    int elevation;
-    int dem; 
-    char timezone[45];
-    char modification_date[15];
-};
+// struct ReadCountry{
+//     int geonameid;  
+//     char name[205];
+//     char asciiname[205];     
+//     char alternatenames[10005];
+//     double latitude;
+//     double longitude;     
+//     char feature_class[5]; 
+//     char feature_code[15];
+//     char country_code[10];
+//     char cc2[205];
+//     char admin1_code[25];
+//     char admin2_code[85];
+//     char admin3_code[25];
+//     char admin4_code[25];
+//     unsigned int population;
+//     int elevation;
+//     int dem; 
+//     char timezone[45];
+//     char modification_date[15];
+// };
 
 struct city{
     char asciiname[205];     
@@ -109,7 +109,9 @@ void fill_fields_city(struct city *one_city, char *buffer);
 void load_countries(struct Pays *countries);
 void fill_fields_country(struct Pays *one_country, char *buffer);
 unsigned int remove_hashtags(FILE *fptr, int count);
-void associate_countries(struct city *cities, unsigned int city_count, struct Pays *countries, unsigned int country_count);
+void associate_countries(struct city *cities, unsigned int city_count, 
+                            struct Pays *countries, unsigned int country_count);
+int cmpfunc (const void * a, const void * b);
 
 int main(int argc, char *argv[]) {
     unsigned int country_count = count_lines_country();
@@ -119,23 +121,14 @@ int main(int argc, char *argv[]) {
     struct city cities[city_count];
     load_cities(cities);
     associate_countries(cities, city_count, countries, country_count);
+    qsort(cities, city_count, sizeof(struct city), cmpfunc);
 
     //Debug only
-    // unsigned int city_count = count_lines("cities15000.txt");
     int i;
     for (i = 0; i < city_count; ++i)
     {
-        // printf ("%s %s %u\n", cities[i].asciiname, cities[i].pays, cities[i].population);
         printf (FORMAT_COLONNES, 0, cities[i].asciiname, cities[i].pays, cities[i].population);
     }
-
-    // unsigned int country_count = count_lines_country();
-    // int j;
-    // for (j = 0; j < country_count; ++j)
-    // {
-    //     printf ("%s %s\n", countries[j].nom, countries[j].code);
-    // }
-    //
 
     return 0;
 }
@@ -169,8 +162,8 @@ unsigned int count_lines_country() {
 
 unsigned int remove_hashtags(FILE *fptr, int count) {
     rewind(fptr);
-    char buffer[sizeof(struct ReadCountry) + 1];
-    while (fgets(buffer, sizeof(struct ReadCountry), fptr) != NULL)
+    char buffer[600 + 1];
+    while (fgets(buffer, 600, fptr) != NULL)
         if (buffer[0] == '#') 
             count = count - 1;
     return count;
@@ -224,10 +217,10 @@ void fill_fields_city(struct city *one_city, char *buffer) {
 
 void load_countries(struct Pays *countries) {
     FILE *fptr = open_file("countryInfo.txt");
-    char buffer[sizeof(struct ReadCountry) + 1];
+    char buffer[600 + 1];
     int country_count = 0;
 
-    while (fgets(buffer, sizeof(struct ReadCountry), fptr) != NULL) {
+    while (fgets(buffer, 600, fptr) != NULL) {
         if (buffer[0] != '#') {
             fill_fields_country(&countries[country_count], buffer);
             country_count = country_count + 1;
@@ -263,4 +256,10 @@ void associate_countries(struct city *cities, unsigned int city_count, struct Pa
             }
         }
     }
+}
+
+int cmpfunc (const void * a, const void * b) {
+    int l = ((struct city *)a)->population;
+    int r = ((struct city *)b)->population; 
+    return (r - l);
 }
