@@ -14,7 +14,9 @@ Program parameters :\n\
 #include <errno.h>
 
 #define FORMAT_TITRE    "%4s   %-20.20s   %-20.20s   %s\n"
-#define FORMAT_COLONNES "%4d   %-20.20s   %-20.20s   %10ld\n"
+#define FORMAT_COLONNES "%4d   %-20.20s   %-20.20s   %10d\n"
+// #define FORMAT_COLONNES "%4d   %-20.20s   %-20.20s   %10ld\n"
+
 
 /**
  * ----------------
@@ -82,6 +84,7 @@ struct city{
     char asciiname[205];     
     char country_code[10];
     unsigned int population;
+    char pays[50]; // Le pays dans laquelle la ville existe
 };
 
 /**
@@ -106,27 +109,32 @@ void fill_fields_city(struct city *one_city, char *buffer);
 void load_countries(struct Pays *countries);
 void fill_fields_country(struct Pays *one_country, char *buffer);
 unsigned int remove_hashtags(FILE *fptr, int count);
+void associate_countries(struct city *cities, unsigned int city_count, struct Pays *countries, unsigned int country_count);
 
 int main(int argc, char *argv[]) {
-    struct Pays countries[count_lines_country()];
+    unsigned int country_count = count_lines_country();
+    struct Pays countries[country_count];
     load_countries(countries);
-    struct city cities[count_lines("cities15000.txt")];
+    unsigned int city_count = count_lines("cities15000.txt");
+    struct city cities[city_count];
     load_cities(cities);
-    
+    associate_countries(cities, city_count, countries, country_count);
+
     //Debug only
-    unsigned int file_lines = count_lines("cities15000.txt");
+    // unsigned int city_count = count_lines("cities15000.txt");
     int i;
-    for (i = 0; i < file_lines; ++i)
+    for (i = 0; i < city_count; ++i)
     {
-        printf ("%s %s %u\n", cities[i].asciiname, cities[i].country_code, cities[i].population);
+        // printf ("%s %s %u\n", cities[i].asciiname, cities[i].pays, cities[i].population);
+        printf (FORMAT_COLONNES, 0, cities[i].asciiname, cities[i].pays, cities[i].population);
     }
 
-    unsigned int country_count = count_lines_country();
-    int j;
-    for (j = 0; j < country_count; ++j)
-    {
-        printf ("%s %s\n", countries[j].nom, countries[j].code);
-    }
+    // unsigned int country_count = count_lines_country();
+    // int j;
+    // for (j = 0; j < country_count; ++j)
+    // {
+    //     printf ("%s %s\n", countries[j].nom, countries[j].code);
+    // }
     //
 
     return 0;
@@ -226,12 +234,6 @@ void load_countries(struct Pays *countries) {
         }
     }
 
-    // int i;
-    // for (i = 0; i < country_count; ++i)
-    // {
-    //     printf ("%s %s\n", countries[i].nom, countries[i].code);
-    // }
-
     close_file(fptr);
 }
 
@@ -246,5 +248,19 @@ void fill_fields_country(struct Pays *one_country, char *buffer) {
             strcpy(one_country -> nom, field);
         }
         field_count = field_count + 1;
+    }
+}
+
+void associate_countries(struct city *cities, unsigned int city_count, struct Pays *countries, unsigned int country_count) {
+    int city_counter;
+    int country_counter;
+
+    for (city_counter = 0; city_counter < city_count; city_counter++) {
+        for (country_counter = 0; country_counter < country_count; country_counter++) {
+            if (strcmp(cities[city_counter].country_code, countries[country_counter].code) == 0) {
+                strcpy(cities[city_counter].pays, countries[country_counter].nom);
+                break;
+            }
+        }
     }
 }
