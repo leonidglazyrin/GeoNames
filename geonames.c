@@ -1,3 +1,7 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
 #define USAGE "\
 Usage: %s <NUMBER OF CITIES>\n\
 \n\
@@ -8,10 +12,6 @@ If no argument is provided, the program prints this help and exit.\n\
 Program parameters :\n\
   NUMBER of cities         Number de cities to print (1..500)\n\
   "
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-
 #define FORMAT_TITRE    "%4s   %-20.20s   %-20.20s   %s\n"
 #define FORMAT_COLONNES "%4d   %-20.20s   %-20.20s   %10d\n"
 // #define FORMAT_COLONNES "%4d   %-20.20s   %-20.20s   %10ld\n"
@@ -68,48 +68,32 @@ enum error {
     ERREUR_ARGS_TYPE	    = 3
 };
 
-unsigned int count_lines_city();
-unsigned int count_lines_country();
-void load_cities(struct city *cities);
+//Function prototypes
+
+int handle_parameters(int argc, char *argv[]);
+int is__not_numeric(char arg[]);
+
 FILE* open_file(char *file_name);
 void close_file(FILE *fptr);
+
+unsigned int count_lines_city();
+unsigned int count_lines_country();
+unsigned int remove_hashtags(FILE *fptr, int count);
+
+void load_cities(struct city *cities);
 void fill_fields_city(struct city *one_city, char *buffer);
 void load_countries(struct Pays *countries);
 void fill_fields_country(struct Pays *one_country, char *buffer);
-unsigned int remove_hashtags(FILE *fptr, int count);
 void associate_countries(struct city *cities, unsigned int city_count, 
                             struct Pays *countries, unsigned int country_count);
-int cmpfunc (const void * a, const void * b);
-int handle_parameters(int argc, char *argv[]);
-int is__not_numeric(char arg[]);
-void print_result(struct city *cities, int number_cities);
 char *get_field(char **buffer);
 
-int main(int argc, char *argv[]) {
-    int status_code = handle_parameters(argc, argv);
+int compare_function (const void *a, const void *b);
 
-    if (status_code != 0) {
-        return status_code;
-    }
+void print_result(struct city *cities, int number_cities);
 
-    int number_cities = atoi(argv[1]);
 
-    unsigned int country_count = count_lines_country();
-    struct Pays countries[country_count];
-    load_countries(countries);
-
-    unsigned int city_count = count_lines_city();
-    struct city cities[city_count];
-    load_cities(cities);
-
-    associate_countries(cities, city_count, countries, country_count);
-
-    qsort(cities, city_count, sizeof(struct city), cmpfunc);
-
-    print_result(cities, number_cities);
-
-    return 0;
-}
+//Function implemenetaions
 
 unsigned int count_lines_city() {
     FILE *fptr = open_file("cities15000.txt");
@@ -244,7 +228,7 @@ void associate_countries(struct city *cities, unsigned int city_count,
     }
 }
 
-int cmpfunc (const void *a, const void *b) {
+int compare_function(const void *a, const void *b) {
     int city_one = ((struct city *) a) -> population;
     int city_other = ((struct city *) b) -> population; 
     return (city_other - city_one);
@@ -300,4 +284,30 @@ char* get_field(char **buffer) {
         }
     }
     return field;
+}
+
+int main(int argc, char *argv[]) {
+    int status_code = handle_parameters(argc, argv);
+
+    if (status_code != 0) {
+        return status_code;
+    }
+
+    int number_cities = atoi(argv[1]);
+
+    unsigned int country_count = count_lines_country();
+    struct Pays countries[country_count];
+    load_countries(countries);
+
+    unsigned int city_count = count_lines_city();
+    struct city cities[city_count];
+    load_cities(cities);
+
+    associate_countries(cities, city_count, countries, country_count);
+
+    qsort(cities, city_count, sizeof(struct city), compare_function);
+
+    print_result(cities, number_cities);
+
+    return 0;
 }
