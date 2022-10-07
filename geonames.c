@@ -245,8 +245,8 @@ void associate_countries(struct city *cities, unsigned int city_count,
 }
 
 int cmpfunc (const void *a, const void *b) {
-    int city_one = ((struct city *)a) -> population;
-    int city_other = ((struct city *)b) -> population; 
+    int city_one = ((struct city *) a) -> population;
+    int city_other = ((struct city *) b) -> population; 
     return (city_other - city_one);
 }
 
@@ -254,21 +254,20 @@ int handle_parameters(int argc, char *argv[]) {
     if (argc != 2) {
         printf("%s\n", "nombre arguments invalide");
         printf(USAGE, "./geonames");
-        return 1;
+        return ERREUR_NB_ARGS;
     }
 
     if (is__not_numeric(argv[1])) {
         printf("%s\n", "type argument invalide");
-        return 3;
+        return ERREUR_ARGS_TYPE;
     }
 
     if ((atoi(argv[1]) < 1) || (atoi(argv[1]) > 5000)) {
         printf("%s\n", "nombre de ville invalide");
-        return 2;
+        return ERREUR_NB_VILLES;
     }
 
-
-    return 0;
+    return OK;
 }
 
 int is__not_numeric(char arg[]) {
