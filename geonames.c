@@ -11,12 +11,10 @@ Program parameters :\n\
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <errno.h>
 
 #define FORMAT_TITRE    "%4s   %-20.20s   %-20.20s   %s\n"
 #define FORMAT_COLONNES "%4d   %-20.20s   %-20.20s   %10d\n"
 // #define FORMAT_COLONNES "%4d   %-20.20s   %-20.20s   %10ld\n"
-
 
 /**
  * ----------------
@@ -27,14 +25,13 @@ struct Pays {
     char nom[50]; // Le nom du pays
     char code[3]; // Le code de deux lettres identifiant le pays
 };
-// const struct Pays PAYS_BIDON = {"??", "??"};
 
-// struct Ville {
-//     char nom[100];    // Le nom ASCII de la ville
-//     long population;  // La population
-//     struct Pays pays; // Le pays dans laquelle la ville existe
-// };
-// const struct Ville VILLE_BIDON = {"??", -1, {"??", "??"}};
+struct city{
+    char asciiname[205];     
+    char country_code[10];
+    unsigned int population;
+    char pays[50]; // Le pays dans laquelle la ville existe
+};
 
 struct ReadCity{
     int geonameid;  
@@ -56,35 +53,6 @@ struct ReadCity{
     int dem; 
     char timezone[45];
     char modification_date[15];
-};
-
-// struct ReadCountry{
-//     int geonameid;  
-//     char name[205];
-//     char asciiname[205];     
-//     char alternatenames[10005];
-//     double latitude;
-//     double longitude;     
-//     char feature_class[5]; 
-//     char feature_code[15];
-//     char country_code[10];
-//     char cc2[205];
-//     char admin1_code[25];
-//     char admin2_code[85];
-//     char admin3_code[25];
-//     char admin4_code[25];
-//     unsigned int population;
-//     int elevation;
-//     int dem; 
-//     char timezone[45];
-//     char modification_date[15];
-// };
-
-struct city{
-    char asciiname[205];     
-    char country_code[10];
-    unsigned int population;
-    char pays[50]; // Le pays dans laquelle la ville existe
 };
 
 /**
@@ -112,23 +80,41 @@ unsigned int remove_hashtags(FILE *fptr, int count);
 void associate_countries(struct city *cities, unsigned int city_count, 
                             struct Pays *countries, unsigned int country_count);
 int cmpfunc (const void * a, const void * b);
+int handle_parameters(int argc, char *argv[]);
+int is__not_numeric(char arg[]);
 
 int main(int argc, char *argv[]) {
+    int number_cities = handle_parameters(argc, argv);
+
+    if (number_cities == 0) {
+        return 0;
+    }
+
     unsigned int country_count = count_lines_country();
     struct Pays countries[country_count];
     load_countries(countries);
+
     unsigned int city_count = count_lines("cities15000.txt");
     struct city cities[city_count];
     load_cities(cities);
+
     associate_countries(cities, city_count, countries, country_count);
     qsort(cities, city_count, sizeof(struct city), cmpfunc);
 
-    //Debug only
+    // Debug only
     int i;
     for (i = 0; i < city_count; ++i)
     {
-        printf (FORMAT_COLONNES, 0, cities[i].asciiname, cities[i].pays, cities[i].population);
+        printf (FORMAT_COLONNES, i + 1, cities[i].asciiname, cities[i].pays, cities[i].population);
     }
+
+    // char name[201];
+    // fgets(name,200,stdin);
+    // printf("%s", name);
+
+    // printf("%s\n", argv[0]);
+    // printf("%s\n", argv[1]);
+    // printf("%s\n", argv[2]);
 
     return 0;
 }
@@ -193,7 +179,7 @@ FILE* open_file(char *file_name) {
     FILE *fptr = fopen(file_name, "r");
     
     if (fptr == NULL) {
-        printf("Erreur %d\n", errno);
+        printf("Erreur %d\n", 2);
         exit(1);
     }
     return fptr;
@@ -262,4 +248,33 @@ int cmpfunc (const void * a, const void * b) {
     int l = ((struct city *)a)->population;
     int r = ((struct city *)b)->population; 
     return (r - l);
+}
+
+int handle_parameters(int argc, char *argv[]) {
+    if (argc != 2) {
+        printf("%s\n", "nombre arguments invalide");
+        printf("%s\n", USAGE);
+        return 0;
+    }
+
+    if (is__not_numeric(argv[1])) {
+        printf("%s\n", "type argument invalide");
+        return 0;
+    }
+
+    if ((atoi(argv[1]) < 1) || (atoi(argv[1]) > 5000)) {
+        printf("%s\n", "nombre de ville invalide");
+        return 0;
+    }
+
+    return atoi(argv[1]);
+}
+
+int is__not_numeric(char arg[]) {
+    int i;
+    for (i = 0; i < strlen(arg); i++) {
+        if(arg[i] < '0' || arg[i] > '9')
+            return 1;
+    }
+    return 0;
 }
