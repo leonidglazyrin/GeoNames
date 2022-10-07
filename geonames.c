@@ -1,5 +1,5 @@
 #define USAGE "\
-Usage: %s  <NUMBER OF CITIES>\n\
+Usage: %s <NUMBER OF CITIES>\n\
 \n\
 Display a table of the n most populous cities on stdout. The number of cities must not exceed 5000.\n\
 \n\
@@ -68,7 +68,7 @@ enum error {
     ERREUR_ARGS_TYPE	    = 3
 };
 
-unsigned int count_lines(char *file_name);
+unsigned int count_lines_city();
 unsigned int count_lines_country();
 void load_cities(struct city *cities);
 FILE* open_file(char *file_name);
@@ -82,53 +82,42 @@ void associate_countries(struct city *cities, unsigned int city_count,
 int cmpfunc (const void * a, const void * b);
 int handle_parameters(int argc, char *argv[]);
 int is__not_numeric(char arg[]);
+void print_result(struct city *cities, int number_cities);
+char *get_field(char **buffer);
 
 int main(int argc, char *argv[]) {
-    int number_cities = handle_parameters(argc, argv);
+    int status_code = handle_parameters(argc, argv);
 
-    if (number_cities == 0) {
-        return 0;
+    if (status_code != 0) {
+        return status_code;
     }
+
+    int number_cities = atoi(argv[1]);
 
     unsigned int country_count = count_lines_country();
     struct Pays countries[country_count];
     load_countries(countries);
 
-    unsigned int city_count = count_lines("cities15000.txt");
+    unsigned int city_count = count_lines_city();
     struct city cities[city_count];
     load_cities(cities);
 
     associate_countries(cities, city_count, countries, country_count);
+
     qsort(cities, city_count, sizeof(struct city), cmpfunc);
 
-    // Debug only
-    int i;
-    printf (FORMAT_TITRE, "Rang", "Nom", "Pays", "Population");
-    for (i = 0; i < number_cities; ++i) {
-        // if (strcmp(cities[i].asciiname, "Araguari") == 0){
-            printf (FORMAT_COLONNES, i + 1, cities[i].asciiname, cities[i].pays, cities[i].population);
-        // }
-        // printf (FORMAT_COLONNES, i + 1, cities[i].asciiname, cities[i].pays, cities[i].population);
-    }
-
-    // char name[201];
-    // fgets(name,200,stdin);
-    // printf("%s", name);
-
-    // printf("%s\n", argv[0]);
-    // printf("%s\n", argv[1]);
-    // printf("%s\n", argv[2]);
+    print_result(cities, number_cities);
 
     return 0;
 }
 
-unsigned int count_lines(char *file_name) {
-    FILE *fptr = open_file(file_name);
+unsigned int count_lines_city() {
+    FILE *fptr = open_file("cities15000.txt");
     unsigned int count = 0;
     char c;
 
     for (c = getc(fptr); c != EOF; c = getc(fptr))
-        if (c == '\n') // Increment count if this character is newline
+        if (c == '\n')
             count = count + 1;
 
     close_file(fptr);
@@ -141,7 +130,7 @@ unsigned int count_lines_country() {
     char c;
 
     for (c = getc(fptr); c != EOF; c = getc(fptr))
-        if (c == '\n') // Increment count if this character is newline
+        if (c == '\n')
             count = count + 1;
     
     count = remove_hashtags(fptr, count);
@@ -193,7 +182,7 @@ void fill_fields_city(struct city *one_city, char *buffer) {
     char *field;
     char field14[50];
 
-    while ((field = strsep(&buffer, "\t")) != NULL) {
+    while ((field = get_field(&buffer)) != NULL) {
         if (field_count == 3) {
             strcpy(one_city -> asciiname, field);
         } else if (field_count == 9) {
@@ -230,7 +219,7 @@ void fill_fields_country(struct Pays *one_country, char *buffer) {
     int field_count = 1;
     char *field;
 
-    while ((field = strsep(&buffer, "\t")) != NULL) {
+    while ((field = get_field(&buffer)) != NULL) {
         if (field_count == 1) {
             strcpy(one_country -> code, field);
         } else if (field_count == 5) {
@@ -240,9 +229,10 @@ void fill_fields_country(struct Pays *one_country, char *buffer) {
     }
 }
 
-void associate_countries(struct city *cities, unsigned int city_count, struct Pays *countries, unsigned int country_count) {
-    int city_counter;
-    int country_counter;
+void associate_countries(struct city *cities, unsigned int city_count, 
+                            struct Pays *countries, unsigned int country_count) {
+    unsigned int city_counter;
+    unsigned int country_counter;
 
     for (city_counter = 0; city_counter < city_count; city_counter++) {
         for (country_counter = 0; country_counter < country_count; country_counter++) {
@@ -254,40 +244,61 @@ void associate_countries(struct city *cities, unsigned int city_count, struct Pa
     }
 }
 
-int cmpfunc (const void * a, const void * b) {
-    int l = ((struct city *)a)->population;
-    int r = ((struct city *)b)->population; 
-    return (r - l);
+int cmpfunc (const void *a, const void *b) {
+    int city_one = ((struct city *)a) -> population;
+    int city_other = ((struct city *)b) -> population; 
+    return (city_other - city_one);
 }
 
 int handle_parameters(int argc, char *argv[]) {
     if (argc != 2) {
         printf("%s\n", "nombre arguments invalide");
-        printf("%s\n", USAGE);
-        return 0;
+        printf(USAGE, "./geonames");
+        return 1;
     }
 
     if (is__not_numeric(argv[1])) {
         printf("%s\n", "type argument invalide");
-        return 0;
+        return 3;
     }
 
     if ((atoi(argv[1]) < 1) || (atoi(argv[1]) > 5000)) {
         printf("%s\n", "nombre de ville invalide");
-        return 0;
+        return 2;
     }
 
-    return atoi(argv[1]);
+
+    return 0;
 }
 
 int is__not_numeric(char arg[]) {
-    int i;
-    char minus = '-';
-    char first = arg[0];
+    unsigned int i;
     if ('-' == arg[0]) 
         return 0;
     for (i = 0; i < strlen(arg); i++)
         if(arg[i] < '0' || arg[i] > '9')
             return 1;
     return 0;
+}
+
+void print_result(struct city *cities, int number_cities) {
+    int i;
+    printf(FORMAT_TITRE, "Rang", "Nom", "Pays", "Population");
+    printf("%s\n", "----   ---                    ----                   ----------");
+    for (i = 0; i < number_cities; ++i)
+        printf (FORMAT_COLONNES, i + 1, cities[i].asciiname, cities[i].pays, cities[i].population);
+}
+
+char* get_field(char **buffer) {
+    char *field = *buffer;
+    if (field) {
+        *buffer += strcspn(*buffer, "\t");
+        if (**buffer){
+            *(*buffer) = '\0';
+            *buffer = *buffer + 1;
+        } else {
+            *buffer = 0; 
+        }
+    }
+    return field;
 }
