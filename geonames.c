@@ -103,9 +103,12 @@ int main(int argc, char *argv[]) {
 
     // Debug only
     int i;
-    for (i = 0; i < city_count; ++i)
-    {
-        printf (FORMAT_COLONNES, i + 1, cities[i].asciiname, cities[i].pays, cities[i].population);
+    printf (FORMAT_TITRE, "Rang", "Nom", "Pays", "Population");
+    for (i = 0; i < number_cities; ++i) {
+        // if (strcmp(cities[i].asciiname, "Araguari") == 0){
+            printf (FORMAT_COLONNES, i + 1, cities[i].asciiname, cities[i].pays, cities[i].population);
+        // }
+        // printf (FORMAT_COLONNES, i + 1, cities[i].asciiname, cities[i].pays, cities[i].population);
     }
 
     // char name[201];
@@ -188,14 +191,21 @@ FILE* open_file(char *file_name) {
 void fill_fields_city(struct city *one_city, char *buffer) {
     int field_count = 1;
     char *field;
+    char field14[50];
 
     while ((field = strsep(&buffer, "\t")) != NULL) {
         if (field_count == 3) {
             strcpy(one_city -> asciiname, field);
         } else if (field_count == 9) {
             strcpy(one_city -> country_code, field);
+        } else if (field_count == 14) {
+            strcpy(field14, field);
         } else if (field_count == 15) {
-            one_city -> population = (unsigned int) atoi(field);
+            if (atoi(field) < 15000) {
+                one_city -> population = (unsigned int) atoi(field14);
+            } else {
+                one_city -> population = (unsigned int) atoi(field);
+            }
         }
         field_count = field_count + 1;
     }
@@ -272,9 +282,12 @@ int handle_parameters(int argc, char *argv[]) {
 
 int is__not_numeric(char arg[]) {
     int i;
-    for (i = 0; i < strlen(arg); i++) {
+    char minus = '-';
+    char first = arg[0];
+    if ('-' == arg[0]) 
+        return 0;
+    for (i = 0; i < strlen(arg); i++)
         if(arg[i] < '0' || arg[i] > '9')
             return 1;
-    }
     return 0;
 }
