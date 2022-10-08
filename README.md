@@ -64,7 +64,6 @@ l'exécution.
 Entrez `make test` pour exécuter la suite de tests automatiques.
 
 Mes résultats:
-
 ```sh
 ok 1 test0 : Aucun argument
 ok 2 test1 : Trop d arguments
@@ -74,12 +73,14 @@ ok 5 test4 : Argument caractère
 ok 6 test5 : Argument chaine de caracteres
 ok 7 test6 : afficher tableau de 5 villes
 ok 8 test7 : affiche 1 ville
-ok 9 test8 : affiche 10 villes # skip
-ok 10 test9 : affiche 5000 villes # skip
-ok 11 test10 : affiche 2500 villes # skip
+not ok 9 test8 : affiche 10 villes
+not ok 10 test9 : affiche 5000 villes
+not ok 11 test10 : affiche 2500 villes
 ```
+8 tests réussissent, tandis 3 échouent.
 
-8 tests réussissent, tandis 3 échouent
+> Étant donné que les données évoluent rapidement, l'ordre des villes
+change fréquement.
 
 ## Dépendances
 
