@@ -43,6 +43,14 @@ seulement saisir une série de commandes pour l'exécuter). En particulier,
 indiquez les commandes qui doivent être entrées pour la compilation et
 l'exécution.
 
+```sh
+git clone https://gitlab.info.uqam.ca/glazyrin.leonid/inf3135-tp1-a22.git
+cd inf3135-tp1-a22
+make
+make database
+./geonames 10
+```
+
 ## Tests
 
 Entrez `make test` pour exécuter la suite de tests automatiques.
@@ -89,21 +97,21 @@ Indiquez toutes les tâches qui ont été complétés en insérant un `X` entre 
 crochets. Si une tâche n'a pas été complétée, expliquez pourquoi (lors de la
 remise, vous pouvez supprimer ce paragraphe).
 
-* [ ] Le nom du dépôt GitLab est exactement `inf3135-tp1-a22` (Pénalité de
+* [X] Le nom du dépôt GitLab est exactement `inf3135-tp1-a22` (Pénalité de
   **50%**).
-* [ ] L'URL du dépôt GitLab est exactement (remplacer `utilisateur` par votre
+* [X] L'URL du dépôt GitLab est exactement (remplacer `utilisateur` par votre
   nom identifiant GitLab) `https://gitlab.info.uqam.ca/utilisateur/inf3135-tp1-a22`
   (Pénalité de **50%**).
-* [ ] Les usagers `dogny_g` et `correcteurs` a accès au projet en mode *Developer*
+* [X] Les usagers `dogny_g` et `correcteurs` a accès au projet en mode *Developer*
   (Pénalité de **50%**).
-* [ ] Le dépôt GitLab est un *fork* de [ce
+* [X] Le dépôt GitLab est un *fork* de [ce
   dépôt](https://gitlab.info.uqam.ca/inf3135-sdo/geonames)
   (Pénalité de **50%**).
-* [ ] Le dépôt GitLab est privé (Pénalité de **50%**).
-* [ ] Le dépôt contient au moins un fichier `.gitignore`.
-* [ ] Le fichier `Makefile` permet de compiler le projet lorsqu'on entre
+* [X] Le dépôt GitLab est privé (Pénalité de **50%**).
+* [X] Le dépôt contient au moins un fichier `.gitignore`.
+* [X] Le fichier `Makefile` permet de compiler le projet lorsqu'on entre
   `make`. Il supporte les cibles `html`, `test`, `database` et `clean`.
-* [ ] Le nombre de tests qui réussissent/échouent avec la `make test` est
+* [X] Le nombre de tests qui réussissent/échouent avec la `make test` est
   indiqué quelque part dans le fichier `README.md`.
 * [ ] Les sections incomplètes de ce fichier (`README.md`) ont été complétées.
 * [ ] L'en-tête du fichier est documentée.

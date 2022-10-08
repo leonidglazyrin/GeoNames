@@ -11,7 +11,7 @@ If no argument is provided, the program prints this help and exit.\n\
 \n\
 Program parameters :\n\
   NUMBER of cities         Number de cities to print (1..500)\n\
-  "
+"
 #define FORMAT_TITRE    "%4s   %-20.20s   %-20.20s   %s\n"
 #define FORMAT_COLONNES "%4d   %-20.20s   %-20.20s   %10d\n"
 // #define FORMAT_COLONNES "%4d   %-20.20s   %-20.20s   %10ld\n"
@@ -92,6 +92,9 @@ int compare_function (const void *a, const void *b);
 
 void print_result(struct city *cities, int number_cities);
 
+void handle_redirection(int argc);
+int trim(char *buffer);
+int is_it_space(char c);
 
 //Function implemenetaions
 
@@ -286,10 +289,76 @@ char* get_field(char **buffer) {
     return field;
 }
 
+char* get_field2(char **buffer) {
+    char *field = *buffer;
+    if (field) {
+        *buffer += strcspn(*buffer, " ");
+        if (**buffer){
+            *(*buffer) = '\0';
+            *buffer = *buffer + 1;
+        } else {
+            *buffer = 0; 
+        }
+    }
+    return field;
+}
+
+void handle_redirection(int argc) {
+    if (argc != 2) {
+        FILE* fptr = stdin;
+        char buffer[101];
+        fgets(buffer, 100, fptr);
+        buffer[strlen(buffer) - 1] = '\0';
+        // printf("%ld", strlen(buffer));
+
+        if (strlen(buffer) == 0) {
+            return;
+        }
+
+        int pos = trim(buffer);
+        char *buffer_no_space = &buffer[pos];
+        char *params[3];
+        int field_count = 1;
+        char *field;
+
+        // buffer_no_space[strlen(buffer_no_space)] = ' ';
+
+        while ((field = get_field2(&buffer_no_space)) != NULL && field_count < 3 && strcmp(field, " ") != 0) {
+            // if(strcmp(field, "\n") == 0) {
+            //     break;
+            // }
+            // printf("Field:%s", field);
+            // printf("Length:%ld\n", strlen(field));
+            params[field_count] = field;
+            field_count = field_count + 1;
+        }
+
+        // printf("%s\n", params[0]);
+        // printf("%s\n", params[1]);
+        // printf("%d\n", field_count + 1);
+        int status_code = handle_parameters(field_count, params);
+    }
+}
+
+int trim(char *buffer) {
+    int j = 0;
+    while(is_it_space(buffer[j])) {
+        j++;
+    }
+    return j;
+}
+
+int is_it_space(char c) {
+	return (c == '\t' || c == '\n' ||
+	    c == '\v' || c == '\f' || c == '\r' || c == ' ' ? 1 : 0);
+}
+
 int main(int argc, char *argv[]) {
+    handle_redirection(argc);
+
     int status_code = handle_parameters(argc, argv);
 
-    if (status_code != 0) {
+    if (status_code != OK) {
         return status_code;
     }
 
@@ -307,7 +376,7 @@ int main(int argc, char *argv[]) {
 
     qsort(cities, city_count, sizeof(struct city), compare_function);
 
-    print_result(cities, number_cities);
+    // print_result(cities, number_cities);
 
     return 0;
 }
