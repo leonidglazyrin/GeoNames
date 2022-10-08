@@ -1,5 +1,6 @@
 before_script:
     - apt-get update -qq
+    - apt-get install -y zip unzip pandoc
     - git clone https://github.com/bats-core/bats-core.git /tmp/bats
     - mkdir -p /tmp/local
     - bash /tmp/bats/install.sh /tmp/local

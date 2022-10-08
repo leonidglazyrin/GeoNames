@@ -31,20 +31,25 @@ lisibilité avec un éditeur de texte.
 
 ## Description
 
-Décrivez ici le projet. Commencez d'abord par une description générale, puis
-donnez ensuite des détails. Indiquez le contexte dans lequel ce travail est
-accompli (cours, sigle, enseignant, université).
+Le projet [GeoNames](http://www.geonames.org/) propose gratuitement des données
+géographiques sous la license [CreativeCommons](http://creativecommons.org/licenses/by/3.0/). 
+Elles sont utilisées dans de nombreuses applications et promeuvent par 
+la même occasion la philosophie de [l'Open data](https://fr.wikipedia.org/wiki/Open_data).
 
-Aussi, insérer un lien vers le [sujet du travail](sujet.md).
+Le programme consiste à utiliser certaines de ces données pour afficher la liste des 
+villes ayant la plus grande population sur notre planète. Si on éxecute l'executable 
+avec, par exemple, le paramètre `10`, la liste des 10 villes les plus populées 
+en ordre décroissant sera affiché.
+
+Travail accompli dans le contexte du cours 
+Construction et maintenance de logiciels (INF3135) donnee par Serge Dogny à
+l'UQAM.
+
+[Contraintes du travail](sujet.md)
 
 ## Auteur
 
-Indiquez ici votre prénom et nom, puis votre code permanent entre parenthèses,
-sans mettre en gras ou en italique.
-
-Par exemple,
-
-Serge Dogny (ABCD12345678)
+Leonid Glazyrin (GLAL77080105)
 
 ## Fonctionnement
 
