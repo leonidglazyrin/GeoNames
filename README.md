@@ -45,6 +45,16 @@ Travail accompli dans le contexte du cours
 Construction et maintenance de logiciels (INF3135) donnee par Serge Dogny à
 l'UQAM.
 
+Le contenu du projet:
+
+* `README.md`: ce fichier
+* `Makefile`: permet d'automatiser la compilation
+* `check.bats`: serie de tests
+* `sujet.md`: sujet du travail
+* `geonames.c`: code source
+* `.gitignore`: ignorer certains fichiers lors de la gestion des version
+* `.gitla-ci.yml`: instructions d'intégration continu avec GitLab CI/CD
+
 [Contraintes du travail](sujet.md)
 
 ## Auteur
