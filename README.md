@@ -1,34 +1,6 @@
 # TP1: GeoNames
 
 
-## Format Markdown (supprimer cette section avant la remise)
-
-N'oubliez pas de bien exploiter le format Markdown.
-
-Sauter une ligne pour changer de paragraphe.
-
-Mettre les noms de fichier et bout de code courts entre apostrophes inversés.
-Par exemple, si vous parlez du fichier `Makefile`.
-
-Mettre les longs bouts de code dans des blocs de code (triples apostrophes
-inversés). Par exemple, vous pouvez donner un exemple de commande comme suit:
-
-```sh
-$ make
-$ ls -a
-```
-
-Utiliser des listes à puces ou des énumérations le plus possible (plus agréable
-à lire). Par exemple, pour décrire le contenu du projet:
-
-* `README.md`: ce fichier
-* `Makefile`: permet d'automatiser la compilation
-* etc.
-
-Bien aérer le contenu du fichier source (`README.md`). Éviter les longues
-lignes dans le fichier Markdown (par exemple, limiter à 80) pour une meilleure
-lisibilité avec un éditeur de texte.
-
 ## Description
 
 Le projet [GeoNames](http://www.geonames.org/) propose gratuitement des données
@@ -54,6 +26,8 @@ Le contenu du projet:
 * `geonames.c`: code source
 * `.gitignore`: ignorer certains fichiers lors de la gestion des version
 * `.gitla-ci.yml`: instructions d'intégration continu avec GitLab CI/CD
+* `github-pandoc.css`: style CSS pour les version HTML des fichiers généré
+par la commande `make html`
 
 [Contraintes du travail](sujet.md)
 
@@ -104,10 +78,10 @@ change fréquement.
 
 ## Références
 
-Indiquez ici les références que vous avez utilisées pour compléter le projet,
-avec l'hyperlien vers la référence. Pas besoin de mentionner les diapositives
-du cours, mais si vous avez eu recours à un site d'aide, un fragment de code ou
-une discussion sur un forum, mentionnez-le.
+* [Manipuler des fichier en C](https://www.programiz.com/c-programming/c-file-input-output)
+* [Compter nombre de ligne dans un fichier](https://www.geeksforgeeks.org/c-program-count-number-lines-file/)
+* [Iterer sur les champs d'une ligne de texte](https://opensource.apple.com/source/Libc/Libc-186/string.subproj/strsep.c.auto.html)
+* [Tri rapide](https://www.tutorialspoint.com/c_standard_library/c_function_qsort.htm)
 
 ## État du projet
 
