@@ -92,9 +92,10 @@ int compare_function (const void *a, const void *b);
 
 void print_result(struct city *cities, int number_cities);
 
-void handle_redirection(int argc);
+int handle_redirection(char **params);
 int trim(char *buffer);
 int is_it_space(char c);
+int get_from_redirection(char **params);
 
 //Function implemenetaions
 
@@ -239,22 +240,33 @@ int compare_function(const void *a, const void *b) {
 
 int handle_parameters(int argc, char *argv[]) {
     if (argc != 2) {
-        printf("%s\n", "nombre arguments invalide");
-        printf(USAGE, "./geonames");
         return ERREUR_NB_ARGS;
     }
 
     if (is__not_numeric(argv[1])) {
-        printf("%s\n", "type argument invalide");
         return ERREUR_ARGS_TYPE;
     }
 
     if ((atoi(argv[1]) < 1) || (atoi(argv[1]) > 5000)) {
-        printf("%s\n", "nombre de ville invalide");
         return ERREUR_NB_VILLES;
     }
 
     return OK;
+}
+
+void print_errors(int error_code) {
+    if (error_code == ERREUR_NB_ARGS) {
+        printf("%s\n", "nombre arguments invalide");
+        printf(USAGE, "./geonames");
+    }
+
+    if (error_code == ERREUR_ARGS_TYPE) {
+        printf("%s\n", "type argument invalide");
+    }
+
+    if (error_code == ERREUR_NB_VILLES) {
+        printf("%s\n", "nombre de ville invalide");
+    }
 }
 
 int is__not_numeric(char arg[]) {
@@ -303,41 +315,57 @@ char* get_field2(char **buffer) {
     return field;
 }
 
-void handle_redirection(int argc) {
-    if (argc != 2) {
-        FILE* fptr = stdin;
-        char buffer[101];
-        fgets(buffer, 100, fptr);
-        buffer[strlen(buffer) - 1] = '\0';
-        // printf("%ld", strlen(buffer));
+int handle_redirection(char **params) {
+    FILE* fptr = stdin;
+    char buffer[101];
+    fgets(buffer, 100, fptr);
+    buffer[strlen(buffer) - 1] = '\0';
 
-        if (strlen(buffer) == 0) {
-            return;
-        }
-
-        int pos = trim(buffer);
-        char *buffer_no_space = &buffer[pos];
-        char *params[3];
-        int field_count = 1;
-        char *field;
-
-        // buffer_no_space[strlen(buffer_no_space)] = ' ';
-
-        while ((field = get_field2(&buffer_no_space)) != NULL && field_count < 3 && strcmp(field, " ") != 0) {
-            // if(strcmp(field, "\n") == 0) {
-            //     break;
-            // }
-            // printf("Field:%s", field);
-            // printf("Length:%ld\n", strlen(field));
-            params[field_count] = field;
-            field_count = field_count + 1;
-        }
-
-        // printf("%s\n", params[0]);
-        // printf("%s\n", params[1]);
-        // printf("%d\n", field_count + 1);
-        int status_code = handle_parameters(field_count, params);
+    if (strlen(buffer) == 0) {
+        fclose(fptr);
+        return ERREUR_NB_ARGS;
     }
+
+    int pos = trim(buffer);
+    char *buffer_no_space = &buffer[pos];
+    // char *params[3];
+    int field_count = 1;
+    char *field;
+
+
+    while ((field = get_field2(&buffer_no_space)) != NULL && field_count < 3 && strcmp(field, " ") != 0) {
+        params[field_count] = field;
+        field_count = field_count + 1;
+    }
+
+    // printf("%s\n", params[1]);
+    // printf("%s\n", params[2]);
+
+    fclose(fptr);
+    return handle_parameters(field_count, params);
+}
+
+int get_from_redirection(char **params) {
+    // FILE* fptr = stdin;
+    // char buffer[101];
+    // fgets(buffer, 100, fptr);
+    // buffer[strlen(buffer) - 1] = '\0';
+
+    // int pos = trim(buffer);
+    // char *buffer_no_space = &buffer[pos];
+    // char *params[3];
+    // int field_count = 1;
+    // char *field;
+
+    // while ((field = get_field2(&buffer_no_space)) != NULL && field_count < 3 && strcmp(field, " ") != 0) {
+    //     params[field_count] = field;
+    //     field_count = field_count + 1;
+    // }
+
+    // fclose(fptr);
+    // printf("%s", params[1]);
+    // printf("%s", params[2]);
+    return atoi(params[1]);
 }
 
 int trim(char *buffer) {
@@ -354,15 +382,23 @@ int is_it_space(char c) {
 }
 
 int main(int argc, char *argv[]) {
-    handle_redirection(argc);
-
+    int number_cities;
     int status_code = handle_parameters(argc, argv);
 
+    char *params[3];
+
     if (status_code != OK) {
-        return status_code;
+        status_code = handle_redirection(params);
+        if (status_code != OK) {
+            print_errors(status_code);
+            return status_code;
+        }
+        number_cities = atoi(params[1]);
+    } else {
+        number_cities = atoi(argv[1]);
     }
 
-    int number_cities = atoi(argv[1]);
+    // int number_cities = atoi(argv[1]);
 
     unsigned int country_count = count_lines_country();
     struct Pays countries[country_count];
@@ -376,7 +412,7 @@ int main(int argc, char *argv[]) {
 
     qsort(cities, city_count, sizeof(struct city), compare_function);
 
-    // print_result(cities, number_cities);
+    print_result(cities, number_cities);
 
     return 0;
 }
