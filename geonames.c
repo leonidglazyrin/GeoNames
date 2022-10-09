@@ -15,6 +15,7 @@ Program parameters :\n\
 #define FORMAT_TITRE    "%4s   %-20.20s   %-20.20s   %s\n"
 #define FORMAT_COLONNES "%4d   %-20.20s   %-20.20s   %10d\n"
 // #define FORMAT_COLONNES "%4d   %-20.20s   %-20.20s   %10ld\n"
+#define NO_REDIRECTION 10
 
 /**
  * ----------------
@@ -95,7 +96,6 @@ void print_result(struct city *cities, int number_cities);
 int handle_redirection(char **params);
 int trim(char *buffer);
 int is_it_space(char c);
-int get_from_redirection(char **params);
 
 //Function implemenetaions
 
@@ -243,6 +243,10 @@ int handle_parameters(int argc, char *argv[]) {
         return ERREUR_NB_ARGS;
     }
 
+    // if (is__not_numeric(argv[1])) {
+    //     return ERREUR_ARGS_TYPE;
+    // }
+    
     if (is__not_numeric(argv[1])) {
         return ERREUR_ARGS_TYPE;
     }
@@ -317,6 +321,7 @@ char* get_field2(char **buffer) {
 
 int handle_redirection(char **params) {
     FILE* fptr = stdin;
+
     char buffer[101];
     fgets(buffer, 100, fptr);
     buffer[strlen(buffer) - 1] = '\0';
@@ -328,44 +333,17 @@ int handle_redirection(char **params) {
 
     int pos = trim(buffer);
     char *buffer_no_space = &buffer[pos];
-    // char *params[3];
     int field_count = 1;
     char *field;
 
-
-    while ((field = get_field2(&buffer_no_space)) != NULL && field_count < 3 && strcmp(field, " ") != 0) {
+    while ((field = get_field2(&buffer_no_space)) != NULL && field_count < 3 && strcmp(field, "") != 0) {
         params[field_count] = field;
         field_count = field_count + 1;
     }
 
-    // printf("%s\n", params[1]);
-    // printf("%s\n", params[2]);
-
     fclose(fptr);
+
     return handle_parameters(field_count, params);
-}
-
-int get_from_redirection(char **params) {
-    // FILE* fptr = stdin;
-    // char buffer[101];
-    // fgets(buffer, 100, fptr);
-    // buffer[strlen(buffer) - 1] = '\0';
-
-    // int pos = trim(buffer);
-    // char *buffer_no_space = &buffer[pos];
-    // char *params[3];
-    // int field_count = 1;
-    // char *field;
-
-    // while ((field = get_field2(&buffer_no_space)) != NULL && field_count < 3 && strcmp(field, " ") != 0) {
-    //     params[field_count] = field;
-    //     field_count = field_count + 1;
-    // }
-
-    // fclose(fptr);
-    // printf("%s", params[1]);
-    // printf("%s", params[2]);
-    return atoi(params[1]);
 }
 
 int trim(char *buffer) {
@@ -384,21 +362,34 @@ int is_it_space(char c) {
 int main(int argc, char *argv[]) {
     int number_cities;
     int status_code = handle_parameters(argc, argv);
+    int status_code_redirect;
 
     char *params[3];
 
-    if (status_code != OK) {
-        status_code = handle_redirection(params);
-        if (status_code != OK) {
-            print_errors(status_code);
-            return status_code;
+    if (status_code == ERREUR_NB_ARGS && argc == 1) {
+        status_code_redirect = handle_redirection(params);
+        if (status_code_redirect != OK) {
+            print_errors(status_code_redirect);
+            return status_code_redirect;
         }
         number_cities = atoi(params[1]);
+    } else if (status_code != OK) {
+        print_errors(status_code);
+        return status_code;
     } else {
         number_cities = atoi(argv[1]);
     }
 
-    // int number_cities = atoi(argv[1]);
+    // if (status_code != OK) {
+    //     status_code_redirect = handle_redirection(params);
+    //     if (status_code_redirect == NO_REDIRECTION) {
+    //         print_errors(status_code);
+    //         return status_code;
+    //     }
+    //     number_cities = atoi(params[1]);
+    // } else {
+    //     number_cities = atoi(argv[1]);
+    // }
 
     unsigned int country_count = count_lines_country();
     struct Pays countries[country_count];
