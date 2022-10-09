@@ -1,3 +1,17 @@
+/**
+ *  geonames.c
+ *
+ *  Display a table of the n most populous cities, by looking into
+ *  cities15000.txt and countryInfo.txt files.
+ *  
+ *  ```sh
+ *  ./geonames.c 10
+ *  ./geonames < fileWithParameters
+ *  ```
+ *  
+ *  @author Leonid Glazyrin
+ */
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -21,11 +35,14 @@ Program parameters :\n\
  * Types de données
  * ----------------
  */
-struct Pays {
+
+// A country
+struct Country {
     char nom[50]; // Le nom du pays
     char code[3]; // Le code de deux lettres identifiant le pays
 };
 
+// A city
 struct city{
     char asciiname[205];     
     char country_code[10];
@@ -33,6 +50,7 @@ struct city{
     char pays[50]; // Le pays dans laquelle la ville existe
 };
 
+// For the length of a line to read into buffer
 struct ReadCity{
     int geonameid;  
     char name[205];
@@ -68,36 +86,203 @@ enum error {
     ERREUR_ARGS_TYPE	    = 3
 };
 
-//Function prototypes
 
+/**
+ * -----------------------
+ * Function prototypes
+ * -----------------------
+ */
+
+/**
+ *  Verifies the number and type of parameters in argv
+ *
+ *  @param argc  Parameter count
+ *  @param argv  Array of parameters
+ *
+ *  @return error code from enum error
+ */
 int handle_parameters(int argc, char *argv[]);
-int is__not_numeric(char arg[]);
 
-FILE* open_file(char *file_name);
-void close_file(FILE *fptr);
+/**
+ *  Check whether a string is not numeric
+ *
+ *  @param arg  string
+ *
+ *  @return 0 if not numeric
+ *          1 if numeric
+ */
+int is_not_numeric(char arg[]);
 
-unsigned int count_lines_city();
-unsigned int count_lines_country();
-unsigned int remove_hashtags(FILE *fptr, int count);
 
-void load_cities(struct city *cities);
-void fill_fields_city(struct city *one_city, char *buffer);
-void load_countries(struct Pays *countries);
-void fill_fields_country(struct Pays *one_country, char *buffer);
-void associate_countries(struct city *cities, unsigned int city_count, 
-                            struct Pays *countries, unsigned int country_count);
-char *get_field(char **buffer, const char *delim);
-
-int compare_function (const void *a, const void *b);
-
-void print_result(struct city *cities, int number_cities);
-
+/**
+ * Handles piping (./geonames < file)
+ *
+ * @param params array where parameters from stdin redirection
+ * will be stored
+ *
+ * @return error code from enum error
+ */
 int handle_redirection(char **params);
+
+/**
+ *  Removes trailing whitespaces of a string
+ *
+ *  @param buffer string
+ *
+ *  @return pointer to the first char which isn't a whitespace
+ */
 char* trim(char *buffer);
+
+/**
+ *  Check whether a char is a whitespace
+ *
+ *  @param c a character
+ *
+ *  @return 1 if it is considered a whitespace
+ *          0 if not
+ */
 int is_it_space(char c);
+
+/**
+ *  Check whether a file was piped to the program
+ *
+ *  @return 1 no file was redirected to the standard input
+ *          0 if there was a file passed to the standard input
+ */
 unsigned int check_no_stdin();
 
-//Function implemenetaions
+/**
+ *  Opens a file and handles error cases
+ * 
+ *  @param file_name name of the file
+ *
+ *  @return pointer to the file
+ */
+FILE* open_file(char *file_name);
+
+/**
+ *  Closes a file and handles error cases
+ *
+ *  @param fptr pointer to the file to close
+ */
+void close_file(FILE *fptr);
+
+/**
+ *  Counts the number of lines in the cities text file
+ *  usefull to know when creating the array containing them
+ *
+ *  @return number of lines
+ */
+unsigned int count_lines_city();
+
+/**
+ *  Counts the number of lines in the counties text file
+ *  usefull to know when creating the array containing them
+ *
+ *  @return number of lines
+ */
+unsigned int count_lines_country();
+
+/**
+ *  Substract all lines starting with "#" in countries file
+ *
+ *  @param fptr pointer to the file containing lines starting with hashtags
+ *  @param count total number of lines in the file
+ *
+ *  @return the new line count
+ */
+unsigned int remove_hashtags(FILE *fptr, int count);
+
+/**
+ *  Iterates over the lines in cities and fills the array of cities
+ *
+ *  @param cities pointer to the array of struct city
+ */
+void load_cities(struct city *cities);
+
+/**
+ *  Fills the assciname, population and country code of
+ *  one city
+ *
+ *  @param one_city pointer to the particular city in an array
+ *  @param buffer the full text line containing all information about a city
+ */
+void fill_fields_city(struct city *one_city, char *buffer);
+
+/**
+ *  Iterates over the lines in countries and fills 
+ *  the array of (country - country code) associations
+ *
+ *  @param countries pointer to the array of struct Country
+ */
+void load_countries(struct Country *countries);
+
+/**
+ *  Fills the country and country code of one country
+ *
+ *  @param one_country pointer to the particular country in an array
+ *  @param buffer the full text line containing all information about a country
+ */
+void fill_fields_country(struct Country *one_country, char *buffer);
+
+/**
+ *  Associates the field pays of every city to the country's full name
+ *
+ *  @param cities pointer to the array of cities
+ *  @param city_count number of cities in that array
+ *  @param countries pointer to the array of countries
+ *  @param country_count number of countries in that array
+ */
+void associate_countries(struct city *cities, unsigned int city_count, 
+                            struct Country *countries, unsigned int country_count);
+
+/**
+ *  Returns a pointer to a field delimited by delimiter,
+ *  it works by inserting a "\0" insteat of the delimiter
+ *  and modifing the buffer pointer to point past that "\0"
+ * 
+ *  @param buffer a pointer to a pointer to a string where the field
+ *                  are separated by the delimiter
+ *
+ *  @param delimiter string by which the fields are separated
+ *
+ *  @return pointer to one field in the full line
+ */
+char* get_field(char **buffer, const char *delimiter);
+
+/**
+ *  Compares two instances
+ *
+ *  @param a one instance
+ *  @param b another instance
+ *
+ *  @return and int > 0 if a is bigger than b
+ *                  < 0 if a is smaller than b
+ */
+int compare_function(const void *a, const void *b);
+
+/**
+ *  Iterates over all the cities and prints until number_cities - 1 reached
+ *
+ *  @param cities array containing the cities to print
+ *  @param number_cities number of cities the user wished to see
+ */
+void print_result(struct city *cities, int number_cities);
+
+/**
+ *  Executes all the main operations of the program
+ *
+ *  @param number_cities number of cities passed 
+ *                       by the user through command line or pipe
+ */
+void execute_program(int number_cities);
+
+
+/**
+ * -----------------------
+ * Function implemenetaions
+ * -----------------------
+ */
 
 unsigned int count_lines_city() {
     FILE *fptr = open_file("cities15000.txt");
@@ -159,7 +344,7 @@ FILE* open_file(char *file_name) {
     FILE *fptr = fopen(file_name, "r");
     
     if (fptr == NULL) {
-        printf("Erreur %d\n", 2);
+        printf("Erreur dans l'ouverture du fichier.\n");
         exit(1);
     }
     return fptr;
@@ -188,7 +373,7 @@ void fill_fields_city(struct city *one_city, char *buffer) {
     }
 }
 
-void load_countries(struct Pays *countries) {
+void load_countries(struct Country *countries) {
     FILE *fptr = open_file("countryInfo.txt");
     char buffer[600 + 1];
     int country_count = 0;
@@ -203,7 +388,7 @@ void load_countries(struct Pays *countries) {
     close_file(fptr);
 }
 
-void fill_fields_country(struct Pays *one_country, char *buffer) {
+void fill_fields_country(struct Country *one_country, char *buffer) {
     int field_count = 1;
     char *field;
 
@@ -218,7 +403,7 @@ void fill_fields_country(struct Pays *one_country, char *buffer) {
 }
 
 void associate_countries(struct city *cities, unsigned int city_count, 
-                            struct Pays *countries, unsigned int country_count) {
+                            struct Country *countries, unsigned int country_count) {
     unsigned int city_counter;
     unsigned int country_counter;
 
@@ -243,7 +428,7 @@ int handle_parameters(int argc, char *argv[]) {
         return ERREUR_NB_ARGS;
     }
     
-    if (is__not_numeric(argv[1])) {
+    if (is_not_numeric(argv[1])) {
         return ERREUR_ARGS_TYPE;
     }
 
@@ -269,7 +454,7 @@ void print_errors(int error_code) {
     }
 }
 
-int is__not_numeric(char arg[]) {
+int is_not_numeric(char arg[]) {
     unsigned int i;
     if ('-' == arg[0]) 
         return 0;
@@ -281,16 +466,16 @@ int is__not_numeric(char arg[]) {
 
 void print_result(struct city *cities, int number_cities) {
     int i;
-    printf(FORMAT_TITRE, "Rang", "Nom", "Pays", "Population");
+    printf(FORMAT_TITRE, "Rang", "Nom", "Country", "Population");
     printf("%s\n", "----   ---                    ----                   ----------");
     for (i = 0; i < number_cities; ++i)
         printf (FORMAT_COLONNES, i + 1, cities[i].asciiname, cities[i].pays, cities[i].population);
 }
 
-char* get_field(char **buffer, const char *delim) {
+char* get_field(char **buffer, const char *delimiter) {
     char *field = *buffer;
     if (field) {
-        *buffer += strcspn(*buffer, delim);
+        *buffer += strcspn(*buffer, delimiter);
         if (**buffer){
             *(*buffer) = '\0';
             *buffer = *buffer + 1;
@@ -342,39 +527,9 @@ int is_it_space(char c) {
 	    c == '\v' || c == '\f' || c == '\r' || c == ' ' ? 1 : 0);
 }
 
-int main(int argc, char *argv[]) {
-    int number_cities;
-
-    int status_code = handle_parameters(argc, argv);
-    int status_code_redirect;
-
-    char *params[3];
-
-    if (status_code == OK && !check_no_stdin()) {
-        print_errors(ERREUR_NB_ARGS);
-        return ERREUR_NB_ARGS;
-    } else if (status_code == ERREUR_NB_ARGS && check_no_stdin()) {
-        print_errors(ERREUR_NB_ARGS);
-        return ERREUR_NB_ARGS;
-    } else if (status_code == ERREUR_NB_ARGS && argc != 1) {
-        print_errors(ERREUR_NB_ARGS);
-        return ERREUR_NB_ARGS;
-    } else if (status_code == ERREUR_NB_ARGS) {
-        status_code_redirect = handle_redirection(params);
-        if (status_code_redirect != OK) {
-            print_errors(status_code_redirect);
-            return status_code_redirect;
-        }
-        number_cities = atoi(params[1]);
-    } else if (status_code != OK) {
-        print_errors(status_code);
-        return status_code;
-    }else {
-        number_cities = atoi(argv[1]);
-    }
-
+void execute_program(int number_cities) {
     unsigned int country_count = count_lines_country();
-    struct Pays countries[country_count];
+    struct Country countries[country_count];
     load_countries(countries);
 
     unsigned int city_count = count_lines_city();
@@ -386,6 +541,51 @@ int main(int argc, char *argv[]) {
     qsort(cities, city_count, sizeof(struct city), compare_function);
 
     print_result(cities, number_cities);
+}
+
+int main(int argc, char *argv[]) {
+    int number_cities;
+
+    int status_code = handle_parameters(argc, argv);
+    int status_code_redirect;
+
+    char *params[3];
+
+    if (status_code == OK && !check_no_stdin()) 
+    {
+        print_errors(ERREUR_NB_ARGS);
+        return ERREUR_NB_ARGS;
+    } 
+    else if (status_code == ERREUR_NB_ARGS && check_no_stdin()) 
+    {
+        print_errors(ERREUR_NB_ARGS);
+        return ERREUR_NB_ARGS;
+    } 
+    else if (status_code == ERREUR_NB_ARGS && argc != 1) 
+    {
+        print_errors(ERREUR_NB_ARGS);
+        return ERREUR_NB_ARGS;
+    } 
+    else if (status_code == ERREUR_NB_ARGS) 
+    {
+        status_code_redirect = handle_redirection(params);
+        if (status_code_redirect != OK) {
+            print_errors(status_code_redirect);
+            return status_code_redirect;
+        }
+        number_cities = atoi(params[1]);
+    } 
+    else if (status_code != OK) 
+    {
+        print_errors(status_code);
+        return status_code;
+    }
+    else 
+    {
+        number_cities = atoi(argv[1]);
+    }
+
+    execute_program(number_cities);
 
     return 0;
 }
