@@ -1,7 +1,7 @@
 /**
  *  geonames.c
  *
- *  Display a table of the n most populous cities, by looking into
+ *  Display a table of the n most populated cities, by looking into
  *  cities15000.txt and countryInfo.txt files.
  *  
  *  ```sh
@@ -29,6 +29,21 @@ Program parameters :\n\
 #define FORMAT_TITRE    "%4s   %-20.20s   %-20.20s   %s\n"
 #define FORMAT_COLONNES "%4d   %-20.20s   %-20.20s   %10d\n"
 // #define FORMAT_COLONNES "%4d   %-20.20s   %-20.20s   %10ld\n"
+
+#define ARBITRARY_LINE_LENGTH   600
+
+#define FIELD_ASCIINAME         3
+#define FIELD_COUNTRY_CODE      9
+#define FIELD_POPULATION        15
+#define FIELD_14                14
+
+#define FIELD_COUNTRY_NAME      5
+#define FIELD_CODE              1
+
+#define MINIMUM_POPULATION      15000
+
+#define MAX_N                   5000
+#define MIN_N                   1
 
 /**
  * ----------------
@@ -83,7 +98,9 @@ enum error {
     OK                      = 0,
     ERREUR_NB_ARGS          = 1,
     ERREUR_NB_VILLES        = 2,
-    ERREUR_ARGS_TYPE	    = 3
+    ERREUR_ARGS_TYPE	    = 3,
+    ERREUR_OPEN_FILE	    = 4,
+    ERREUR_CLOSE_FILE	    = 5
 };
 
 
@@ -210,6 +227,16 @@ void load_cities(struct city *cities);
 void fill_fields_city(struct city *one_city, char *buffer);
 
 /**
+ *  Handles filling in the population of a city
+ *  (sometimes it's in the 14th column and not the 15th)
+ *
+ *  @param one_city pointer to the particular city in an array
+ *  @param field string of the 15th field
+ *  @param field14 value of the 14th field
+ */
+void handle_population(struct city *one_city, char *field, int field14);
+
+/**
  *  Iterates over the lines in countries and fills 
  *  the array of (country - country code) associations
  *
@@ -313,8 +340,8 @@ unsigned int count_lines_country() {
 
 unsigned int remove_hashtags(FILE *fptr, int count) {
     rewind(fptr);
-    char buffer[600 + 1];
-    while (fgets(buffer, 600, fptr) != NULL)
+    char buffer[ARBITRARY_LINE_LENGTH + 1];
+    while (fgets(buffer, ARBITRARY_LINE_LENGTH, fptr) != NULL)
         if (buffer[0] == '#') 
             count = count - 1;
     return count;
@@ -336,7 +363,7 @@ void load_cities(struct city *cities) {
 void close_file(FILE *fptr) {
     if (fclose(fptr) == EOF) {
         printf("Erreur dans la fermeture du fichier.\n");
-        exit(2);
+        exit(ERREUR_CLOSE_FILE);
     }
 }
 
@@ -345,7 +372,7 @@ FILE* open_file(char *file_name) {
     
     if (fptr == NULL) {
         printf("Erreur dans l'ouverture du fichier.\n");
-        exit(1);
+        exit(ERREUR_OPEN_FILE);
     }
     return fptr;
 }
@@ -353,32 +380,44 @@ FILE* open_file(char *file_name) {
 void fill_fields_city(struct city *one_city, char *buffer) {
     int field_count = 1;
     char *field;
-    char field14[50];
+    int field14; // Handle some cases where population is in 14th and not 15th
 
     while ((field = get_field(&buffer, "\t")) != NULL) {
-        if (field_count == 3) {
+        if (field_count == FIELD_ASCIINAME) 
+        {
             strcpy(one_city -> asciiname, field);
-        } else if (field_count == 9) {
+        } 
+        else if (field_count == FIELD_COUNTRY_CODE) 
+        {
             strcpy(one_city -> country_code, field);
-        } else if (field_count == 14) {
-            strcpy(field14, field);
-        } else if (field_count == 15) {
-            if (atoi(field) < 15000) {
-                one_city -> population = (unsigned int) atoi(field14);
-            } else {
-                one_city -> population = (unsigned int) atoi(field);
-            }
+        } 
+        else if (field_count == FIELD_14) 
+        {
+            field14 = (unsigned int) atoi(field);
+        } 
+        else if (field_count == FIELD_POPULATION) 
+        {
+            handle_population(one_city, field, field14);
+            break;
         }
         field_count = field_count + 1;
     }
 }
 
+void handle_population(struct city *one_city, char *field, int field14) {
+    if (atoi(field) < MINIMUM_POPULATION) {
+        one_city -> population = field14;
+    } else {
+        one_city -> population = (unsigned int) atoi(field);
+    }
+}
+
 void load_countries(struct Country *countries) {
     FILE *fptr = open_file("countryInfo.txt");
-    char buffer[600 + 1];
+    char buffer[ARBITRARY_LINE_LENGTH + 1];
     int country_count = 0;
 
-    while (fgets(buffer, 600, fptr) != NULL) {
+    while (fgets(buffer, ARBITRARY_LINE_LENGTH, fptr) != NULL) {
         if (buffer[0] != '#') {
             fill_fields_country(&countries[country_count], buffer);
             country_count = country_count + 1;
@@ -389,13 +428,16 @@ void load_countries(struct Country *countries) {
 }
 
 void fill_fields_country(struct Country *one_country, char *buffer) {
-    int field_count = 1;
+    int field_count = FIELD_CODE;
     char *field;
 
     while ((field = get_field(&buffer, "\t")) != NULL) {
-        if (field_count == 1) {
+        if (field_count == FIELD_CODE) 
+        {
             strcpy(one_country -> code, field);
-        } else if (field_count == 5) {
+        } 
+        else if (field_count == FIELD_COUNTRY_NAME) 
+        {
             strcpy(one_country -> nom, field);
         }
         field_count = field_count + 1;
@@ -432,7 +474,7 @@ int handle_parameters(int argc, char *argv[]) {
         return ERREUR_ARGS_TYPE;
     }
 
-    if ((atoi(argv[1]) < 1) || (atoi(argv[1]) > 5000)) {
+    if ((atoi(argv[1]) < MIN_N) || (atoi(argv[1]) > MAX_N)) {
         return ERREUR_NB_VILLES;
     }
 
@@ -480,7 +522,7 @@ char* get_field(char **buffer, const char *delimiter) {
             *(*buffer) = '\0';
             *buffer = *buffer + 1;
         } else {
-            *buffer = 0; 
+            *buffer = NULL; 
         }
     }
     return field;
@@ -489,8 +531,8 @@ char* get_field(char **buffer, const char *delimiter) {
 int handle_redirection(char **params) {
     FILE* fptr = stdin;
 
-    char buffer[101];
-    fgets(buffer, 100, fptr);
+    char buffer[ARBITRARY_LINE_LENGTH];
+    fgets(buffer, ARBITRARY_LINE_LENGTH, fptr);
     buffer[strlen(buffer) - 1] = '\0';
 
     char *buffer_no_space = trim(buffer);
