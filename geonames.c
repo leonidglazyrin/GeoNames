@@ -95,6 +95,7 @@ void print_result(struct city *cities, int number_cities);
 int handle_redirection(char **params);
 char* trim(char *buffer);
 int is_it_space(char c);
+unsigned int check_no_stdin();
 
 //Function implemenetaions
 
@@ -301,54 +302,13 @@ char* get_field(char **buffer, const char *delim) {
 }
 
 int handle_redirection(char **params) {
-//    if ((fseek(stdin, 0, SEEK_END), ftell(stdin)) > 0)
-// {
-//   rewind(stdin);
-//   char buffer[1024];
-//   fgets(buffer, 1024 , stdin);
-//   puts("yes");
-//   //parse args read in from stdin
-// }
-// else
-// {
-//     puts("no");
-//   //no redirection
-// }
-
     FILE* fptr = stdin;
-
-    if ((fseek(stdin, 0, SEEK_END), ftell(stdin)) > 0) {
-        rewind(stdin);
-        char buffer[1024];
-        fgets(buffer, 1024 , stdin);
-        // puts("yes");
-        //parse args read in from stdin
-    } else {
-        // puts("no");
-        return ERREUR_NB_ARGS;
-        //no redirection
-    }
-
-    // int ch = getchar();
-    // if (ch == EOF) {
-    // if (feof(stdin)) puts("stdin empty");
-    // else             puts("stdin error"); // very rare
-    // } else {
-    // ungetc(ch, stdin); // put back
-    // puts("stdin not empty");
-    // }
 
     char buffer[101];
     fgets(buffer, 100, fptr);
     buffer[strlen(buffer) - 1] = '\0';
 
-    if (strlen(buffer) == 0) {
-        fclose(fptr);
-        return ERREUR_NB_ARGS;
-    }
-
     char *buffer_no_space = trim(buffer);
-
     int field_count = 1;
     char *field;
 
@@ -357,9 +317,16 @@ int handle_redirection(char **params) {
         field_count = field_count + 1;
     }
 
-    fclose(fptr);
-
     return handle_parameters(field_count, params);
+}
+
+unsigned int check_no_stdin() {
+    if ((fseek(stdin, 0, SEEK_END), ftell(stdin)) > 0) {
+        rewind(stdin);
+        return 0;
+    } else {
+        return 1;
+    }
 }
 
 char* trim(char *buffer) {
@@ -377,12 +344,22 @@ int is_it_space(char c) {
 
 int main(int argc, char *argv[]) {
     int number_cities;
+
     int status_code = handle_parameters(argc, argv);
     int status_code_redirect;
 
     char *params[3];
 
-    if (status_code == ERREUR_NB_ARGS && argc == 1) {
+    if (status_code == OK && !check_no_stdin()) {
+        print_errors(ERREUR_NB_ARGS);
+        return ERREUR_NB_ARGS;
+    } else if (status_code == ERREUR_NB_ARGS && check_no_stdin()) {
+        print_errors(ERREUR_NB_ARGS);
+        return ERREUR_NB_ARGS;
+    } else if (status_code == ERREUR_NB_ARGS && argc != 1) {
+        print_errors(ERREUR_NB_ARGS);
+        return ERREUR_NB_ARGS;
+    } else if (status_code == ERREUR_NB_ARGS) {
         status_code_redirect = handle_redirection(params);
         if (status_code_redirect != OK) {
             print_errors(status_code_redirect);
@@ -392,7 +369,7 @@ int main(int argc, char *argv[]) {
     } else if (status_code != OK) {
         print_errors(status_code);
         return status_code;
-    } else {
+    }else {
         number_cities = atoi(argv[1]);
     }
 
