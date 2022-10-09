@@ -15,7 +15,6 @@ Program parameters :\n\
 #define FORMAT_TITRE    "%4s   %-20.20s   %-20.20s   %s\n"
 #define FORMAT_COLONNES "%4d   %-20.20s   %-20.20s   %10d\n"
 // #define FORMAT_COLONNES "%4d   %-20.20s   %-20.20s   %10ld\n"
-#define NO_REDIRECTION 10
 
 /**
  * ----------------
@@ -87,14 +86,14 @@ void load_countries(struct Pays *countries);
 void fill_fields_country(struct Pays *one_country, char *buffer);
 void associate_countries(struct city *cities, unsigned int city_count, 
                             struct Pays *countries, unsigned int country_count);
-char *get_field(char **buffer);
+char *get_field(char **buffer, const char *delim);
 
 int compare_function (const void *a, const void *b);
 
 void print_result(struct city *cities, int number_cities);
 
 int handle_redirection(char **params);
-int trim(char *buffer);
+char* trim(char *buffer);
 int is_it_space(char c);
 
 //Function implemenetaions
@@ -140,7 +139,7 @@ void load_cities(struct city *cities) {
     char buffer[sizeof(struct ReadCity) + 1];
     int city_count = 0;
 
-    while (fgets(buffer, sizeof(struct ReadCity), fptr) != NULL && strlen(buffer) > 10) {
+    while (fgets(buffer, sizeof(struct ReadCity), fptr) != NULL) {
         fill_fields_city(&cities[city_count], buffer);
         city_count = city_count + 1;
     }
@@ -170,7 +169,7 @@ void fill_fields_city(struct city *one_city, char *buffer) {
     char *field;
     char field14[50];
 
-    while ((field = get_field(&buffer)) != NULL) {
+    while ((field = get_field(&buffer, "\t")) != NULL) {
         if (field_count == 3) {
             strcpy(one_city -> asciiname, field);
         } else if (field_count == 9) {
@@ -207,7 +206,7 @@ void fill_fields_country(struct Pays *one_country, char *buffer) {
     int field_count = 1;
     char *field;
 
-    while ((field = get_field(&buffer)) != NULL) {
+    while ((field = get_field(&buffer, "\t")) != NULL) {
         if (field_count == 1) {
             strcpy(one_country -> code, field);
         } else if (field_count == 5) {
@@ -242,10 +241,6 @@ int handle_parameters(int argc, char *argv[]) {
     if (argc != 2) {
         return ERREUR_NB_ARGS;
     }
-
-    // if (is__not_numeric(argv[1])) {
-    //     return ERREUR_ARGS_TYPE;
-    // }
     
     if (is__not_numeric(argv[1])) {
         return ERREUR_ARGS_TYPE;
@@ -291,24 +286,10 @@ void print_result(struct city *cities, int number_cities) {
         printf (FORMAT_COLONNES, i + 1, cities[i].asciiname, cities[i].pays, cities[i].population);
 }
 
-char* get_field(char **buffer) {
+char* get_field(char **buffer, const char *delim) {
     char *field = *buffer;
     if (field) {
-        *buffer += strcspn(*buffer, "\t");
-        if (**buffer){
-            *(*buffer) = '\0';
-            *buffer = *buffer + 1;
-        } else {
-            *buffer = 0; 
-        }
-    }
-    return field;
-}
-
-char* get_field2(char **buffer) {
-    char *field = *buffer;
-    if (field) {
-        *buffer += strcspn(*buffer, " ");
+        *buffer += strcspn(*buffer, delim);
         if (**buffer){
             *(*buffer) = '\0';
             *buffer = *buffer + 1;
@@ -320,7 +301,42 @@ char* get_field2(char **buffer) {
 }
 
 int handle_redirection(char **params) {
+//    if ((fseek(stdin, 0, SEEK_END), ftell(stdin)) > 0)
+// {
+//   rewind(stdin);
+//   char buffer[1024];
+//   fgets(buffer, 1024 , stdin);
+//   puts("yes");
+//   //parse args read in from stdin
+// }
+// else
+// {
+//     puts("no");
+//   //no redirection
+// }
+
     FILE* fptr = stdin;
+
+    if ((fseek(stdin, 0, SEEK_END), ftell(stdin)) > 0) {
+        rewind(stdin);
+        char buffer[1024];
+        fgets(buffer, 1024 , stdin);
+        // puts("yes");
+        //parse args read in from stdin
+    } else {
+        // puts("no");
+        return ERREUR_NB_ARGS;
+        //no redirection
+    }
+
+    // int ch = getchar();
+    // if (ch == EOF) {
+    // if (feof(stdin)) puts("stdin empty");
+    // else             puts("stdin error"); // very rare
+    // } else {
+    // ungetc(ch, stdin); // put back
+    // puts("stdin not empty");
+    // }
 
     char buffer[101];
     fgets(buffer, 100, fptr);
@@ -331,12 +347,12 @@ int handle_redirection(char **params) {
         return ERREUR_NB_ARGS;
     }
 
-    int pos = trim(buffer);
-    char *buffer_no_space = &buffer[pos];
+    char *buffer_no_space = trim(buffer);
+
     int field_count = 1;
     char *field;
 
-    while ((field = get_field2(&buffer_no_space)) != NULL && field_count < 3 && strcmp(field, "") != 0) {
+    while ((field = get_field(&buffer_no_space, " ")) != NULL && field_count < 3 && strcmp(field, "") != 0) {
         params[field_count] = field;
         field_count = field_count + 1;
     }
@@ -346,12 +362,12 @@ int handle_redirection(char **params) {
     return handle_parameters(field_count, params);
 }
 
-int trim(char *buffer) {
+char* trim(char *buffer) {
     int j = 0;
     while(is_it_space(buffer[j])) {
         j++;
     }
-    return j;
+    return &buffer[j];
 }
 
 int is_it_space(char c) {
@@ -379,17 +395,6 @@ int main(int argc, char *argv[]) {
     } else {
         number_cities = atoi(argv[1]);
     }
-
-    // if (status_code != OK) {
-    //     status_code_redirect = handle_redirection(params);
-    //     if (status_code_redirect == NO_REDIRECTION) {
-    //         print_errors(status_code);
-    //         return status_code;
-    //     }
-    //     number_cities = atoi(params[1]);
-    // } else {
-    //     number_cities = atoi(argv[1]);
-    // }
 
     unsigned int country_count = count_lines_country();
     struct Pays countries[country_count];
