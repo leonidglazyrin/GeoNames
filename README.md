@@ -56,7 +56,7 @@ make
 make database
 ```
 
-Finalement pour pourrait exécuter le programme avec un chiffre `n` entre 1 et 5000 :
+Finalement pour exécuter le programme avec un chiffre `n` entre 1 et 5000 :
 ```sh
 ./geonames n
 ```
@@ -66,6 +66,19 @@ Alternativement le nombre peut être passé par un fichier :
 ./geonames < fichier-contenant-un-nombre
 ```
 
+Les cas d'erreur gérés sont :
+1. `n < 1`
+2. `n > 5000`
+3. `n` n'est pas un nombre,
+4. `stdin` redirigée vers un fichier vide
+5. `n` fournie et `stdin` redirigée
+6. `n` dans le fichier est erroné par les mêmes conditions 1, 2 ou 3
+7. Les espaces blancs dans le fichier, avant et après le nombre, ne seront pas considérés
+
+Cas d'erreur non gérés connus :
+1. S'il y a des saut de lignes avant le nombre dans le fichier
+2. Si le nombre est précédé de plus qu'environ 599 espaces étant donné 
+la longueur de ligne arbitraire fixée à 600 par la constante `ARBITRARY_LINE_LENGTH`
 
 ## Tests
 
@@ -87,8 +100,8 @@ not ok 11 test10 : affiche 2500 villes
 ```
 8 tests réussissent, tandis 3 échouent.
 
-> Étant donné que les données évoluent rapidement, l'ordre des villes
-change fréquement.
+> Certains tests échouent étant donné que les données évoluent rapidement 
+et donc l'ordre des villes change fréquement.
 
 ## Dépendances
 
