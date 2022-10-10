@@ -58,7 +58,6 @@ help_first_line="Usage: ./geonames <NUMBER OF CITIES>"
 }
 
 @test "test8 : affiche 10 villes" {
-    skip
     run ./$prog 10
     [ "$status" -eq 0 ]
     [ "${lines[0]}" = "Rang   Nom                    Pays                   Population" ]
@@ -68,7 +67,6 @@ help_first_line="Usage: ./geonames <NUMBER OF CITIES>"
 }
 
 @test "test9 : affiche 5000 villes" {
-    skip
     run ./$prog 5000
     [ "$status" -eq 0 ]
     [ "${lines[0]}" = "Rang   Nom                    Pays                   Population" ]
@@ -78,7 +76,6 @@ help_first_line="Usage: ./geonames <NUMBER OF CITIES>"
 }
 
 @test "test10 : affiche 2500 villes" {
-    skip
     run ./$prog 2500
     [ "$status" -eq 0 ]
     [ "${lines[0]}" = "Rang   Nom                    Pays                   Population" ]
