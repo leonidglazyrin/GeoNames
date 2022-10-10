@@ -28,7 +28,6 @@ Program parameters :\n\
 "
 #define FORMAT_TITRE    "%4s   %-20.20s   %-20.20s   %s\n"
 #define FORMAT_COLONNES "%4d   %-20.20s   %-20.20s   %10d\n"
-// #define FORMAT_COLONNES "%4d   %-20.20s   %-20.20s   %10ld\n"
 
 #define ARBITRARY_LINE_LENGTH   600
 
