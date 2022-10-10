@@ -67,6 +67,7 @@ Alternativement le nombre peut être passé par un fichier :
 ```
 
 Les cas d'erreur gérés sont :
+
 1. `n < 1`
 2. `n > 5000`
 3. `n` n'est pas un nombre,
@@ -77,6 +78,7 @@ Les cas d'erreur gérés sont :
 8. Les espaces blancs dans le fichier, avant et après le nombre, ne seront pas considérés
 
 Cas d'erreur non gérés connus :
+
 1. S'il y a des saut de lignes avant le nombre dans le fichier
 2. Si le nombre est précédé de plus qu'environ 599 espaces dans le fichier étant donné 
 la longueur de ligne arbitraire fixée à 600 par la constante `ARBITRARY_LINE_LENGTH`
