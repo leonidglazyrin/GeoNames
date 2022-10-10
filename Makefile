@@ -2,7 +2,8 @@ CC = gcc
 OPTIONS = -Wall -Wextra -std=c11
 EXE = geonames
 
-geonames: geonames.c link
+geonames: geonames.c
+	$(CC) $(OPTIONS) geonames.c -o $(EXE)
 	
 html:
 	pandoc -f markdown -t html5 -o README.html README.md -c misc/github-pandoc.css
