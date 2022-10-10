@@ -38,7 +38,7 @@ Program parameters :\n\
 #define FIELD_14                14
 
 #define FIELD_COUNTRY_NAME      5
-#define FIELD_CODE              1
+#define COUNTRY_FIELD_CODE              1
 
 #define MINIMUM_POPULATION      15000
 
@@ -129,7 +129,6 @@ int handle_parameters(int argc, char *argv[]);
  *          1 if numeric
  */
 int is_not_numeric(char arg[]);
-
 
 /**
  * Handles piping (./geonames < file)
@@ -318,7 +317,7 @@ unsigned int count_lines_city() {
 
     for (c = getc(fptr); c != EOF; c = getc(fptr))
         if (c == '\n')
-            count = count + 1;
+            count++;
 
     close_file(fptr);
     return count;
@@ -331,7 +330,7 @@ unsigned int count_lines_country() {
 
     for (c = getc(fptr); c != EOF; c = getc(fptr))
         if (c == '\n')
-            count = count + 1;
+            count++;
     
     count = remove_hashtags(fptr, count);
     close_file(fptr);
@@ -343,7 +342,7 @@ unsigned int remove_hashtags(FILE *fptr, int count) {
     char buffer[ARBITRARY_LINE_LENGTH + 1];
     while (fgets(buffer, ARBITRARY_LINE_LENGTH, fptr) != NULL)
         if (buffer[0] == '#') 
-            count = count - 1;
+            count--;
     return count;
 }
 
@@ -353,8 +352,7 @@ void load_cities(struct city *cities) {
     int city_count = 0;
 
     while (fgets(buffer, sizeof(struct ReadCity), fptr) != NULL) {
-        fill_fields_city(&cities[city_count], buffer);
-        city_count = city_count + 1;
+        fill_fields_city(&cities[city_count++], buffer);
     }
 
     close_file(fptr);
@@ -400,16 +398,15 @@ void fill_fields_city(struct city *one_city, char *buffer) {
             handle_population(one_city, field, field14);
             break;
         }
-        field_count = field_count + 1;
+        field_count++;
     }
 }
 
 void handle_population(struct city *one_city, char *field, int field14) {
-    if (atoi(field) < MINIMUM_POPULATION) {
+    if (atoi(field) < MINIMUM_POPULATION)
         one_city -> population = field14;
-    } else {
+    else
         one_city -> population = (unsigned int) atoi(field);
-    }
 }
 
 void load_countries(struct Country *countries) {
@@ -417,30 +414,24 @@ void load_countries(struct Country *countries) {
     char buffer[ARBITRARY_LINE_LENGTH + 1];
     int country_count = 0;
 
-    while (fgets(buffer, ARBITRARY_LINE_LENGTH, fptr) != NULL) {
-        if (buffer[0] != '#') {
-            fill_fields_country(&countries[country_count], buffer);
-            country_count = country_count + 1;
-        }
-    }
+    while (fgets(buffer, ARBITRARY_LINE_LENGTH, fptr) != NULL)
+        if (buffer[0] != '#')
+            fill_fields_country(&countries[country_count++], buffer);
 
     close_file(fptr);
 }
 
 void fill_fields_country(struct Country *one_country, char *buffer) {
-    int field_count = FIELD_CODE;
+    int field_count = COUNTRY_FIELD_CODE;
     char *field;
 
     while ((field = get_field(&buffer, "\t")) != NULL) {
-        if (field_count == FIELD_CODE) 
-        {
+        if (field_count == COUNTRY_FIELD_CODE) 
             strcpy(one_country -> code, field);
-        } 
         else if (field_count == FIELD_COUNTRY_NAME) 
-        {
             strcpy(one_country -> nom, field);
-        }
-        field_count = field_count + 1;
+        
+        field_count++;
     }
 }
 
@@ -449,14 +440,12 @@ void associate_countries(struct city *cities, unsigned int city_count,
     unsigned int city_counter;
     unsigned int country_counter;
 
-    for (city_counter = 0; city_counter < city_count; city_counter++) {
-        for (country_counter = 0; country_counter < country_count; country_counter++) {
+    for (city_counter = 0; city_counter < city_count; city_counter++)
+        for (country_counter = 0; country_counter < country_count; country_counter++)
             if (strcmp(cities[city_counter].country_code, countries[country_counter].code) == 0) {
                 strcpy(cities[city_counter].pays, countries[country_counter].nom);
                 break;
             }
-        }
-    }
 }
 
 int compare_function(const void *a, const void *b) {
@@ -466,17 +455,14 @@ int compare_function(const void *a, const void *b) {
 }
 
 int handle_parameters(int argc, char *argv[]) {
-    if (argc != 2) {
+    if (argc != 2)
         return ERREUR_NB_ARGS;
-    }
     
-    if (is_not_numeric(argv[1])) {
+    if (is_not_numeric(argv[1]))
         return ERREUR_ARGS_TYPE;
-    }
 
-    if ((atoi(argv[1]) < MIN_N) || (atoi(argv[1]) > MAX_N)) {
+    if ((atoi(argv[1]) < MIN_N) || (atoi(argv[1]) > MAX_N))
         return ERREUR_NB_VILLES;
-    }
 
     return OK;
 }
@@ -485,15 +471,10 @@ void print_errors(int error_code) {
     if (error_code == ERREUR_NB_ARGS) {
         printf("%s\n", "nombre arguments invalide");
         printf(USAGE, "./geonames");
-    }
-
-    if (error_code == ERREUR_ARGS_TYPE) {
+    } else if (error_code == ERREUR_ARGS_TYPE)
         printf("%s\n", "type argument invalide");
-    }
-
-    if (error_code == ERREUR_NB_VILLES) {
+    else if (error_code == ERREUR_NB_VILLES)
         printf("%s\n", "nombre de ville invalide");
-    }
 }
 
 int is_not_numeric(char arg[]) {
@@ -529,7 +510,7 @@ char* get_field(char **buffer, const char *delimiter) {
 }
 
 int handle_redirection(char **params) {
-    FILE* fptr = stdin;
+    FILE *fptr = stdin;
 
     char buffer[ARBITRARY_LINE_LENGTH];
     fgets(buffer, ARBITRARY_LINE_LENGTH, fptr);
@@ -539,10 +520,8 @@ int handle_redirection(char **params) {
     int field_count = 1;
     char *field;
 
-    while ((field = get_field(&buffer_no_space, " ")) != NULL && field_count < 3 && strcmp(field, "") != 0) {
-        params[field_count] = field;
-        field_count = field_count + 1;
-    }
+    while ((field = get_field(&buffer_no_space, " ")) != NULL && field_count < 3 && strcmp(field, "") != 0)
+        params[field_count++] = field;
 
     return handle_parameters(field_count, params);
 }
@@ -558,15 +537,15 @@ unsigned int check_no_stdin() {
 
 char* trim(char *buffer) {
     int j = 0;
-    while(is_it_space(buffer[j])) {
+
+    while(is_it_space(buffer[j]))
         j++;
-    }
+    
     return &buffer[j];
 }
 
 int is_it_space(char c) {
-	return (c == '\t' || c == '\n' ||
-	    c == '\v' || c == '\f' || c == '\r' || c == ' ' ? 1 : 0);
+	return (c == '\t' || c == ' ' ? 1 : 0);
 }
 
 void execute_program(int number_cities) {
@@ -593,21 +572,13 @@ int main(int argc, char *argv[]) {
 
     char *params[3];
 
-    if (status_code == OK && !check_no_stdin()) 
+    if ((status_code == OK && !check_no_stdin()) ||
+        (status_code == ERREUR_NB_ARGS && check_no_stdin()) ||
+        (status_code == ERREUR_NB_ARGS && argc != 1)) 
     {
         print_errors(ERREUR_NB_ARGS);
         return ERREUR_NB_ARGS;
-    } 
-    else if (status_code == ERREUR_NB_ARGS && check_no_stdin()) 
-    {
-        print_errors(ERREUR_NB_ARGS);
-        return ERREUR_NB_ARGS;
-    } 
-    else if (status_code == ERREUR_NB_ARGS && argc != 1) 
-    {
-        print_errors(ERREUR_NB_ARGS);
-        return ERREUR_NB_ARGS;
-    } 
+    }
     else if (status_code == ERREUR_NB_ARGS) 
     {
         status_code_redirect = handle_redirection(params);
