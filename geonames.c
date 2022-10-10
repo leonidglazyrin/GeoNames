@@ -37,7 +37,7 @@ Program parameters :\n\
 #define FIELD_14                14
 
 #define FIELD_COUNTRY_NAME      5
-#define COUNTRY_FIELD_CODE              1
+#define COUNTRY_FIELD_CODE      1
 
 #define MINIMUM_POPULATION      15000
 
