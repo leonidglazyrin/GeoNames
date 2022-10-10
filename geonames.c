@@ -118,7 +118,7 @@ enum error {
  *
  *  @return error code from enum error
  */
-int handle_parameters(int argc, char *argv[]);
+int handle_parameters(const int argc, char *argv[]);
 
 /**
  *  Check whether a string is not numeric
@@ -128,7 +128,7 @@ int handle_parameters(int argc, char *argv[]);
  *  @return 0 if not numeric
  *          1 if numeric
  */
-int is_not_numeric(char arg[]);
+unsigned int is_not_numeric(const char arg[]);
 
 /**
  * Handles piping (./geonames < file)
@@ -174,7 +174,7 @@ unsigned int check_no_stdin();
  *
  *  @return pointer to the file
  */
-FILE* open_file(char *file_name);
+FILE* open_file(const char *file_name);
 
 /**
  *  Closes a file and handles error cases
@@ -233,7 +233,7 @@ void fill_fields_city(struct city *one_city, char *buffer);
  *  @param field string of the 15th field
  *  @param field14 value of the 14th field
  */
-void handle_population(struct city *one_city, char *field, int field14);
+void handle_population(struct city *one_city, const char *field, const int field14);
 
 /**
  *  Iterates over the lines in countries and fills 
@@ -259,8 +259,8 @@ void fill_fields_country(struct Country *one_country, char *buffer);
  *  @param countries pointer to the array of countries
  *  @param country_count number of countries in that array
  */
-void associate_countries(struct city *cities, unsigned int city_count, 
-                            struct Country *countries, unsigned int country_count);
+void associate_countries(struct city *cities, const unsigned int city_count, 
+                            struct Country *countries, const unsigned int country_count);
 
 /**
  *  Returns a pointer to a field delimited by delimiter,
@@ -293,7 +293,14 @@ int compare_function(const void *a, const void *b);
  *  @param cities array containing the cities to print
  *  @param number_cities number of cities the user wished to see
  */
-void print_result(struct city *cities, int number_cities);
+void print_result(struct city *cities, unsigned const int number_cities);
+
+/**
+ *  Prints the correspondant message and USAGE if needed
+ *
+ *  @param error_code the error code to print
+ */
+void print_errors(const int error_code);
 
 /**
  *  Executes all the main operations of the program
@@ -301,7 +308,7 @@ void print_result(struct city *cities, int number_cities);
  *  @param number_cities number of cities passed 
  *                       by the user through command line or pipe
  */
-void execute_program(int number_cities);
+void execute_program(unsigned const int number_cities);
 
 
 /**
@@ -349,7 +356,7 @@ unsigned int remove_hashtags(FILE *fptr, int count) {
 void load_cities(struct city *cities) {
     FILE *fptr = open_file("cities15000.txt");
     char buffer[sizeof(struct ReadCity) + 1];
-    int city_count = 0;
+    unsigned int city_count = 0;
 
     while (fgets(buffer, sizeof(struct ReadCity), fptr) != NULL) {
         fill_fields_city(&cities[city_count++], buffer);
@@ -365,7 +372,7 @@ void close_file(FILE *fptr) {
     }
 }
 
-FILE* open_file(char *file_name) {
+FILE* open_file(const char *file_name) {
     FILE *fptr = fopen(file_name, "r");
     
     if (fptr == NULL) {
@@ -376,7 +383,7 @@ FILE* open_file(char *file_name) {
 }
 
 void fill_fields_city(struct city *one_city, char *buffer) {
-    int field_count = 1;
+    unsigned int field_count = 1;
     char *field;
     int field14; // Handle some cases where population is in 14th and not 15th
 
@@ -402,7 +409,7 @@ void fill_fields_city(struct city *one_city, char *buffer) {
     }
 }
 
-void handle_population(struct city *one_city, char *field, int field14) {
+void handle_population(struct city *one_city, const char *field, const int field14) {
     if (atoi(field) < MINIMUM_POPULATION)
         one_city -> population = field14;
     else
@@ -412,7 +419,7 @@ void handle_population(struct city *one_city, char *field, int field14) {
 void load_countries(struct Country *countries) {
     FILE *fptr = open_file("countryInfo.txt");
     char buffer[ARBITRARY_LINE_LENGTH + 1];
-    int country_count = 0;
+    unsigned int country_count = 0;
 
     while (fgets(buffer, ARBITRARY_LINE_LENGTH, fptr) != NULL)
         if (buffer[0] != '#')
@@ -435,8 +442,8 @@ void fill_fields_country(struct Country *one_country, char *buffer) {
     }
 }
 
-void associate_countries(struct city *cities, unsigned int city_count, 
-                            struct Country *countries, unsigned int country_count) {
+void associate_countries(struct city *cities, const unsigned int city_count, 
+                            struct Country *countries, const unsigned int country_count) {
     unsigned int city_counter;
     unsigned int country_counter;
 
@@ -449,12 +456,12 @@ void associate_countries(struct city *cities, unsigned int city_count,
 }
 
 int compare_function(const void *a, const void *b) {
-    int city_one = ((struct city *) a) -> population;
-    int city_other = ((struct city *) b) -> population; 
+    const unsigned int city_one = ((struct city *) a) -> population;
+    const unsigned int city_other = ((struct city *) b) -> population; 
     return (city_other - city_one);
 }
 
-int handle_parameters(int argc, char *argv[]) {
+int handle_parameters(const int argc, char *argv[]) {
     if (argc != 2)
         return ERREUR_NB_ARGS;
     
@@ -467,7 +474,7 @@ int handle_parameters(int argc, char *argv[]) {
     return OK;
 }
 
-void print_errors(int error_code) {
+void print_errors(const int error_code) {
     if (error_code == ERREUR_NB_ARGS) {
         printf("%s\n", "nombre arguments invalide");
         printf(USAGE, "./geonames");
@@ -477,7 +484,7 @@ void print_errors(int error_code) {
         printf("%s\n", "nombre de ville invalide");
 }
 
-int is_not_numeric(char arg[]) {
+unsigned int is_not_numeric(const char arg[]) {
     unsigned int i;
     if ('-' == arg[0]) 
         return 0;
@@ -487,11 +494,11 @@ int is_not_numeric(char arg[]) {
     return 0;
 }
 
-void print_result(struct city *cities, int number_cities) {
-    int i;
+void print_result(struct city *cities, unsigned const int number_cities) {
+    unsigned int i;
     printf(FORMAT_TITRE, "Rang", "Nom", "Pays", "Population");
     printf("%s\n", "----   ---                    ----                   ----------");
-    for (i = 0; i < number_cities; ++i)
+    for (i = 0; i < number_cities; i++)
         printf (FORMAT_COLONNES, i + 1, cities[i].asciiname, cities[i].pays, cities[i].population);
 }
 
@@ -512,12 +519,12 @@ char* get_field(char **buffer, const char *delimiter) {
 int handle_redirection(char **params) {
     FILE *fptr = stdin;
 
-    char buffer[ARBITRARY_LINE_LENGTH];
+    char buffer[ARBITRARY_LINE_LENGTH + 1];
     fgets(buffer, ARBITRARY_LINE_LENGTH, fptr);
     buffer[strlen(buffer) - 1] = '\0';
 
     char *buffer_no_space = trim(buffer);
-    int field_count = 1;
+    unsigned int field_count = 1;
     char *field;
 
     while ((field = get_field(&buffer_no_space, " ")) != NULL && field_count < 3 && strcmp(field, "") != 0)
@@ -536,7 +543,7 @@ unsigned int check_no_stdin() {
 }
 
 char* trim(char *buffer) {
-    int j = 0;
+    unsigned int j = 0;
 
     while(is_it_space(buffer[j]))
         j++;
@@ -544,16 +551,16 @@ char* trim(char *buffer) {
     return &buffer[j];
 }
 
-int is_it_space(char c) {
+int is_it_space(const char c) {
 	return (c == '\t' || c == ' ' ? 1 : 0);
 }
 
-void execute_program(int number_cities) {
-    unsigned int country_count = count_lines_country();
+void execute_program(unsigned const int number_cities) {
+    unsigned const int country_count = count_lines_country();
     struct Country countries[country_count];
     load_countries(countries);
 
-    unsigned int city_count = count_lines_city();
+    unsigned const int city_count = count_lines_city();
     struct city cities[city_count];
     load_cities(cities);
 
@@ -565,10 +572,10 @@ void execute_program(int number_cities) {
 }
 
 int main(int argc, char *argv[]) {
-    int number_cities;
+    unsigned int number_cities;
 
-    int status_code = handle_parameters(argc, argv);
-    int status_code_redirect;
+    unsigned const int status_code = handle_parameters(argc, argv);
+    unsigned int status_code_redirect;
 
     char *params[3];
 
