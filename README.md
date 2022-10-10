@@ -73,7 +73,8 @@ Les cas d'erreur gérés sont :
 4. `stdin` redirigée vers un fichier vide
 5. `n` fournie et `stdin` redirigée
 6. `n` dans le fichier est erroné par les mêmes conditions 1, 2 ou 3
-7. Les espaces blancs dans le fichier, avant et après le nombre, ne seront pas considérés
+7. Aucun argument fourni et `stdin` non redirigé
+8. Les espaces blancs dans le fichier, avant et après le nombre, ne seront pas considérés
 
 Cas d'erreur non gérés connus :
 1. S'il y a des saut de lignes avant le nombre dans le fichier
