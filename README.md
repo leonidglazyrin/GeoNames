@@ -77,7 +77,7 @@ Les cas d'erreur gérés sont :
 
 Cas d'erreur non gérés connus :
 1. S'il y a des saut de lignes avant le nombre dans le fichier
-2. Si le nombre est précédé de plus qu'environ 599 espaces étant donné 
+2. Si le nombre est précédé de plus qu'environ 599 espaces dans le fichier étant donné 
 la longueur de ligne arbitraire fixée à 600 par la constante `ARBITRARY_LINE_LENGTH`
 
 ## Tests
