@@ -2,9 +2,8 @@ CC = gcc
 OPTIONS = -Wall -Wextra -std=c11
 EXE = geonames
 
-geonames: geonames.c
-	$(CC) geonames.c $(OPTIONS) -o $(EXE)
-
+geonames: geonames.c link
+	
 html:
 	pandoc -f markdown -t html5 -o README.html README.md -c misc/github-pandoc.css
 	pandoc -f markdown -t html5 -o sujet.html sujet.md -c misc/github-pandoc.css
@@ -18,8 +17,14 @@ database:
 test: geonames database
 	bats check.bats
 
-clean :
+clean:
 	rm *.o -f
 	rm *.html -f
 	rm $(EXE) -f
 	rm cities15000.zip -f
+
+compile:
+	$(CC) $(OPTIONS) -c geonames.c
+
+link: compile
+	$(CC) geonames.o -o $(EXE)
